@@ -1,5 +1,11 @@
 # BINPython
 Lightweight and small portable Python, build with pyinstaller
+# Usage
+```
+-h     --help     View this help
+-f     --file=     Enter Python Filename and run
+-v     --version  View BINPython Version
+```
 # Build
 1. Clone this project
 ```bash
