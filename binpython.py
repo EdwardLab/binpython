@@ -1,16 +1,21 @@
 #BINPython By:XINGYUJIE AGPL-V3.0 LECENSE Release
 #Please follow the LICENSE
-ver="0.15-dev"
+ver="0.15-canary"
 #base import
 import getopt
 import sys
 import platform
+#import for http_server
+import http.server
+import socketserver
+#except ImportError:
+   
 #gui import
 try:
     import tkinter
     import turtle
 #warning for gui
-except:
+except ImportError:
     print("Warning: Some GUI (graphical) libraries for BINPython do not exist, such as tkinter and turtle.  Because they are not built when they are built.  If you need to fix this warning, please complete the support libraries imported in the source code at build time (use pip or build it yourself), if your system does not support these libraries, you can remove or change this hint in the source code and rebuild")
     print("")
 
@@ -18,7 +23,7 @@ except:
 try:
     import fractions
     import cmath
-except:
+except ImportError:
     print("Warning: Some math or computation libraries for BINPython do not exist, such as fractions and cmath.  Because they weren't built when they were built.  If you need to fix this warning, please complete the support libraries imported in the source code when building (use pip or build it yourself), if your system does not support these libraries, you can remove or change this prompt in the source code and rebuild")
     print("")
 #rlcompleter
@@ -27,23 +32,24 @@ try:
     #str
     import rlcompleter
     import array
-except:
+except ImportError:
     print("Warning: Some libraries for functions, data types, etc. for BINPython do not exist, such as rlcomplter and array.  Because they weren't built when they were built.  If you need to fix this warning, please complete the support libraries imported in the source code when building (use pip or build it yourself), if your system does not support these libraries, you can remove or change this prompt in the source code and rebuild")
     print("")
 try:
      import filecmp
      import tempfile
-except:
+except ImportError:
      print("Warning: Some file manipulation libraries for BINPython do not exist, such as filecmp and tempfile.  Because they weren't built when they were built.  If you need to fix this warning, please complete the support libraries imported in the source code when building (use pip or build it yourself), if your system does not support these libraries, you can remove or change this prompt in the source code and rebuild")
      print("")
 #getopt
-opts,args = getopt.getopt(sys.argv[1:],'-h-f:-v',['help','file=','version'])
+opts,args = getopt.getopt(sys.argv[1:],'-h-f:-s:-v',['help','file','server','version'])
 for opt_name,opt_value in opts:
     if opt_name in ('-h','--help'):
         print("[*] Help info")
         print("""
 -h     --help     View this help
 -f     --file       Enter Python Filename and run
+-s.    --server    Start a simple web server that supports html and file transfer (http.server)
 -v     --version  View BINPython Version
 """)
         sys.exit()
@@ -56,6 +62,19 @@ for opt_name,opt_value in opts:
         f = open(file,encoding = "utf-8")
         exec(f.read())
         input("Please enter to continue")
+        sys.exit()
+    if opt_name in ('-s','--server'):
+        server_port = opt_value
+        exec("""
+
+PORT = """ + server_port + """
+
+Handler = http.server.SimpleHTTPRequestHandler
+
+with socketserver.TCPServer(("", PORT), Handler) as httpd:
+    print("serving at port", PORT)
+    httpd.serve_forever()
+""")
         sys.exit()
 #main BINPython
 
