@@ -1,6 +1,6 @@
 #BINPython By:XINGYUJIE AGPL-V3.0 LECENSE Release
 #Please follow the LICENSE
-
+ver="0.15-dev"
 #base import
 import getopt
 import sys
@@ -43,12 +43,12 @@ for opt_name,opt_value in opts:
         print("[*] Help info")
         print("""
 -h     --help     View this help
--f     --file=     Enter Python Filename and run
+-f     --file       Enter Python Filename and run
 -v     --version  View BINPython Version
 """)
         sys.exit()
     if opt_name in ('-v','--version'):
-        print("BINPython By:XINGYUJIE[https://github.com/xingyujie/binpython] AGPL-3.0 LICENSE Release")
+        print("BINPython " + ver + " By:XINGYUJIE[https://github.com/xingyujie/binpython] AGPL-3.0 LICENSE Release")
         print("Python " + platform.python_version())
         exit()
     if opt_name in ('-f','--file'):
@@ -59,7 +59,7 @@ for opt_name,opt_value in opts:
         sys.exit()
 #main BINPython
 
-print("BINPython 0.14 (Python Version:" + platform.python_version() + ")By:XINGYUJIE https://github.com/xingyujie/binpython[Running on " + platform.platform() + " " + platform.version() + "]")
+print("BINPython " + ver + " (Python Version:" + platform.python_version() + ")By:XINGYUJIE https://github.com/xingyujie/binpython[Running on " + platform.platform() + " " + platform.version() + "]")
 print('Type "about", "help", "copyright", "credits" or "license" for more information.')
 try:
     while True:
