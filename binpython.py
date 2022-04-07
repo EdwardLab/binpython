@@ -1,10 +1,12 @@
 #BINPython By:XINGYUJIE AGPL-V3.0 LECENSE Release
 #Please follow the LICENSE
-ver="0.15-canary"
+ver="0.15-beta"
 #base import
 import getopt
 import sys
 import platform
+#fix some libs
+from sys import exit
 #import for http_server
 import http.server
 import socketserver
@@ -41,17 +43,26 @@ try:
 except ImportError:
      print("Warning: Some file manipulation libraries for BINPython do not exist, such as filecmp and tempfile.  Because they weren't built when they were built.  If you need to fix this warning, please complete the support libraries imported in the source code when building (use pip or build it yourself), if your system does not support these libraries, you can remove or change this prompt in the source code and rebuild")
      print("")
-#getopt
-opts,args = getopt.getopt(sys.argv[1:],'-h-f:-s:-v',['help','file','server','version'])
-for opt_name,opt_value in opts:
-    if opt_name in ('-h','--help'):
-        print("[*] Help info")
-        print("""
+#def
+def help():
+    print("[*] BINPython Help")
+    print("""
 -h     --help     View this help
--f     --file       Enter Python Filename and run
--s.    --server    Start a simple web server that supports html and file transfer (http.server)
+-f     --file <filename>       Enter Python Filename and run
+-s.    --server <port>    Start a simple web server that supports html and file transfer (http.server)
 -v     --version  View BINPython Version
 """)
+
+#getopt
+try:
+    opts,args = getopt.getopt(sys.argv[1:],'-h-f:-s:-v',['help','file','server','version'])
+except:
+    print("Please check help:")
+    help()
+    print("The parameters you use do not exist or are not entered completely, please check help!  !  !  !  !")
+for opt_name,opt_value in opts:
+    if opt_name in ('-h','--help'):
+        help()
         sys.exit()
     if opt_name in ('-v','--version'):
         print("BINPython " + ver + " By:XINGYUJIE[https://github.com/xingyujie/binpython] AGPL-3.0 LICENSE Release")
