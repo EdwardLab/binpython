@@ -7,9 +7,9 @@
 #Please follow the LICENSE AGPL-V3
 
 ####################################
-#configure
+#build configure
 
-ver="0.15-stable"
+ver="0.16-canary"
 #Don't change
 
 libs_warning="1"  
@@ -18,7 +18,7 @@ libs_warning="1"
 
 releases_ver="offical"
 importlibs="os" #Don't use "import xxx"
-#importlibs="<library>"
+#importlibs="sys"
 #Imported library name, please use "importlibs="<library name>" instead of "import <library name>"
 
 
@@ -36,6 +36,7 @@ try:
     import getopt
     import sys
     import platform
+    import os
 #fix for exit()
     from sys import exit
 #import for http_server
@@ -47,6 +48,8 @@ except ImportError:
 #gui import
 try:
     import tkinter
+    import tkinter as tk
+    from tkinter import *
     import turtle
 #warning for gui
 except ImportError:
@@ -83,15 +86,17 @@ except ImportError:
 def help():
     print("[*] BINPython Help")
     print("""
--h     --help     View this help
--f     --file <filename>       Enter Python Filename and run
+-h     --help    View this help
+-f     --file <filename>    Enter Python Filename and run
 -s.    --server <port>    Start a simple web server that supports html and file transfer (http.server)
--v     --version  View BINPython Version
+-v     --version    View BINPython Version
+-g     --gui    View GUI About and build info
+-i     --idle    Open BINPython IDLE Code Editor
 """)
-
+about = "BINPython " + ver + "-" + releases_ver + " By:XINGYUJIE[https://github.com/xingyujie/binpython] AGPL-3.0 LICENSE Release"
 #getopt
 try:
-    opts,args = getopt.getopt(sys.argv[1:],'-h-f:-s:-v',['help','file','server','version'])
+    opts,args = getopt.getopt(sys.argv[1:],'-h-f:-s:-g-i-v',['help','gui','idle','version'])
 except:
     print("Please check help:")
     help()
@@ -104,16 +109,15 @@ for opt_name,opt_value in opts:
         print("BINPython " + ver + "-" + releases_ver + " By:XINGYUJIE[https://github.com/xingyujie/binpython] AGPL-3.0 LICENSE Release")
         print("Python " + platform.python_version())
         exit()
-    if opt_name in ('-f','--file'):
+    if opt_name in ('-f'):
         file = opt_value
         f = open(file,encoding = "utf-8")
         exec(f.read())
         input("Please enter to continue")
         sys.exit()
-    if opt_name in ('-s','--server'):
+    if opt_name in ('-s'):
         server_port = opt_value
-        exec("""
-
+        print("""
 PORT = """ + server_port + """
 
 Handler = http.server.SimpleHTTPRequestHandler
@@ -122,7 +126,46 @@ with socketserver.TCPServer(("", PORT), Handler) as httpd:
     print("serving at port", PORT)
     httpd.serve_forever()
 """)
+    if opt_name in ('-g','--gui'):
+        from tkinter import *
+        root = Tk()
+        root.title("Welcome to BINPython")
+        root.geometry('600x300')
+        text =Text(root, width=35, heigh=15)
+        text.pack()
+        text.insert("insert", "BINPython" + about)
+        print(text.get("1.3", "1.end"))
+        ####
+        text=Label(root,text="Welcome to BINPython" + ver,bg="yellow",fg="red",font=('Times', 20, 'bold italic'))
+        text.pack()
+        button=Button(root,text="EXIT",command=root.quit)
+        button.pack(side="bottom")
+        root.mainloop()
         sys.exit()
+    def show():
+        os.system('cls' if os.name == 'nt' else 'clear')
+        print("<<<<<<<<<<START>>>>>>>>>>")
+        exec(e1.get(1.0, END))
+    if opt_name in ('-i','--idle'):
+        import tkinter as tk
+        from tkinter import *
+        import os
+        master = tk.Tk()
+        master.title("BINPython IDLE")
+        
+ 
+        tk.Label(master, text="Type Code", height=5).grid(row=0)
+ 
+        e1 = Text(master,
+            width=150,
+            height=40,)
+        
+        e1.grid(row=0, column=1, padx=10, pady=5)
+        tk.Button(master, text="Run", width=10, command=show).grid(row=3, column=0, sticky="w", padx=10, pady=5)
+        tk.Button(master, text="EXIT", width=10, command=master.quit).grid(row=3, column=1, sticky="e", padx=10, pady=5)
+        master.mainloop()
+       
+
 #main BINPython
 
 print("BINPython " + ver + "-" + releases_ver + " (Python Version:" + platform.python_version() + ")By:XINGYUJIE https://github.com/xingyujie/binpython[Running on " + platform.platform() + " " + platform.version() + "]")
