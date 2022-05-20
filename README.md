@@ -3,8 +3,8 @@ Lightweight and small portable Python, build with pyinstaller
 # Usage
 ```
 -h     --help    View this help
--f  <filename>    Enter Python Filename and run
--s  <port>    Start a simple web server that supports html and file transfer (http.server)
+-f=<filename>   --filename <filename>    Enter Python Filename and run
+-s=<port>   --server <port> Start a simple web server that supports html and file transfer (http.server)
 -v     --version    View BINPython Version
 -g     --gui    View GUI About and build info
 -i     --idle    Open BINPython IDLE Code Editor
