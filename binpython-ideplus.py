@@ -1,11 +1,11 @@
 """
  @header binpython.py
- @author xingyujie
+ @author xingyujie https://github.com/xingyujie
  @abstract BINPython main file
 """
 #BINPython By:XINGYUJIE AGPL-V3.0 LICENSE Release
 #Please follow the LICENSE AGPL-V3
-
+#ide plus version
 ####################################
 #build configure
 
@@ -15,21 +15,17 @@ libs_warning="1"
 #1 is ture 0 is false.
 #Changing the value to 0 will close the prompt that the library does not exist
 
-releases_ver="offical"
-importlibs="os" #Don't use "import xxx"
-#importlibs="sys"
+releases_ver="offical-with-ideplus"
+importlibs="os" #Don't use "import xxx" 
 #Imported library name, please use "importlibs="<library name>" instead of "import <library name>"
 #Please note: The "importlibs" function does not support loading functions (such as from xxxx import xxxx, if necessary, please write it in the following location. However, please note that this operation may have the risk of error reporting, please report issues or solve it yourself
-
 #xxxxxxxxxxxxxx
 
 #from xxxx import xxxx
-
 #xxxxxxxxxxxxxx
-apptitle="BINPython " + ver
 ####################################
 import ctypes
-ctypes.windll.kernel32.SetConsoleTitleW(apptitle)
+ctypes.windll.kernel32.SetConsoleTitleW("BINPython " + ver)
 def self_import(name):
     __import__(name)
 try:
@@ -93,17 +89,18 @@ except ImportError:
 def help():
     print("[*] BINPython Help")
     print("""
--h     --help    View this help
--f     --file=<filename>    Enter Python Filename and run
--s.    --server=<port>    Start a simple web server that supports html and file transfer (http.server)
--v     --version    View BINPython Version
--g     --gui    View GUI About and build info
--i     --idle    Open BINPython IDLE Code Editor
+-h            --help               View this help
+-f <filename> --file=<filename>    Enter Python Filename and run (*.py)
+-s <port>     --server=<port>      Start a simple web server that supports html and file transfer (http.server)
+-v            --version            View BINPython Version
+-g            --gui                View GUI About and build info
+-i            --idle               Open BINPython IDLE Code Editor
+-p            --plus               Open BINPython IDE Plus Code Editor(beta) with http web server
 """)
 about = "BINPython " + ver + "-" + releases_ver + " By:XINGYUJIE[https://github.com/xingyujie/binpython] AGPL-3.0 LICENSE Release"
 #getopt
 try:
-    opts,args = getopt.getopt(sys.argv[1:],'-h-f:-s:-g-i-v',['help','file=','server=','gui','idle','version'])
+    opts,args = getopt.getopt(sys.argv[1:],'-h-f:-s:-g-i-p-v',['help','file=','server=','gui','idle','plus','version'])
 except:
     print("Please check help:")
     help()
@@ -171,6 +168,46 @@ with socketserver.TCPServer(("", PORT), Handler) as httpd:
         tk.Button(master, text="Run", width=10, command=show).grid(row=3, column=0, sticky="w", padx=10, pady=5)
         tk.Button(master, text="EXIT", width=10, command=master.quit).grid(row=3, column=1, sticky="e", padx=10, pady=5)
         master.mainloop()
+    if opt_name in ('-p','--plus'):
+        serverport = input("Please enter server port(like 8080): ")
+        import pywebio.input
+        from pywebio.input import *
+        from pywebio.output import *
+        from pywebio import *
+        from pywebio.session import *
+        import sys
+        import subprocess
+        import os
+        print("______________________________________")
+        print("BINPython WEB IDE STARTED")
+        #IDE Plus main
+        def main():
+            set_env(title="BINPython IDE Plus", auto_scroll_bottom=True)
+            put_html("<h1>BINPython IDE Plus</h1>")
+            put_text('Welcome to BINPython IDE Plus, Please type code',
+                    sep=' '
+                )
+            toast("BINPython IDE Plus is a beta version. May be removed or changed in the future")
+            put_text('_______________________',
+                    sep=' '
+                )
+            res = textarea('BINPython IDE Plus', rows=45, code={
+            'mode': "python",
+            'theme': 'darcula'
+                })
+            exec(res)
+            toast("Run finished!")
+            put_success("Finished, Please see BINPython Window or Terminal")
+            put_text("Here is the code you wrote")
+            put_code(res, language='python')
+            savecodefilename = pywebio.input.input('Do you want to save the code you wrote to a file? Enter a filename and save it')
+            f = open(savecodefilename, 'wb+')
+            f.write(res.encode("utf-8"))
+            toast("Successfully saved")
+            put_success("The save is successful, and the code is saved to binpython file path" + " \nThe file name is " + '"' + savecodefilename + '"')
+        if __name__ == '__main__':
+            start_server(main, debug=True, host='0.0.0.0', port= serverport)
+            pywebio.session.hold()
        
 
 #main BINPython
@@ -179,7 +216,7 @@ print("BINPython " + ver + "-" + releases_ver + " (Python Version:" + platform.p
 print('Type "about", "help", "copyright", "credits" or "license" for more information.')
 try:
     while True:
-        pycmd=input('>>> ')
+        pycmd=input(">>> ")
         if pycmd in globals().keys():
             print(globals()[pycmd])
             continue

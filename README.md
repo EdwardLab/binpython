@@ -2,12 +2,13 @@
 Lightweight and small portable Python, build with pyinstaller
 # Usage
 ```
--h     --help    View this help
--f=<filename>   --filename <filename>    Enter Python Filename and run
--s=<port>   --server <port> Start a simple web server that supports html and file transfer (http.server)
--v     --version    View BINPython Version
--g     --gui    View GUI About and build info
--i     --idle    Open BINPython IDLE Code Editor
+-h            --help               View this help
+-f <filename> --file=<filename>    Enter Python Filename and run (*.py)
+-s <port>     --server=<port>      Start a simple web server that supports html and file transfer (http.server)
+-v            --version            View BINPython Version
+-g            --gui                View GUI About and build info
+-i            --idle               Open BINPython IDLE Code Editor
+-p            --plus               Open BINPython IDE Plus Code Editor(beta) with http web server
 ```
 # Build
 1. Clone this project
