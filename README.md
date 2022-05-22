@@ -17,10 +17,11 @@
 # Why BINPython?
 
 Because:  
-no edit to registry  
-no extra .dlls（only a single executable）  
-licensed with agpl3  
-easy to integrate  
+* no edit to registry  
+* no extra .dlls（only a single executable）  
+* licensed with AGPL-V3.0  
+* easy to integrate  
+* If you need commercial use, please contact us for authorization
 # Usage
 ```
 -h            --help               View this help
@@ -42,7 +43,7 @@ cd binpython
 ```bash
 pip install pyinstaller
 ```
-3.choose BINPython version to build
+3. choose BINPython version to build
 The standard version is for integration into programs.  It is recommended to use the ideplus version for learning 
 
 ## Build BINPthon Standard version
