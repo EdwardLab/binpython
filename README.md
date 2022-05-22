@@ -1,5 +1,10 @@
-# BINPython
-Lightweight and small portable Python, build with pyinstaller
+<h1 align="center" name="binpython">BINPython</h1>
+<p align="center">
+    <em>Lightweight and small portable Python, build with pyinstaller
+</em>
+</p>
+<p align="center">
+
 # Usage
 ```
 -h            --help               View this help
