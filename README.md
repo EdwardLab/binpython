@@ -14,6 +14,13 @@
 ### Discord: https://discord.gg/dz9HwwdSXh
 ### Telegram: @binpython
 ### Twitter: xyj_offical
+# Why BINPython?
+
+Because:  
+no edit to registry  
+no extra .dlls（only a single executable）  
+licensed with agpl3  
+easy to integrate  
 # Usage
 ```
 -h            --help               View this help
