@@ -11,6 +11,8 @@
 ![pyver](https://img.shields.io/badge/PythonVersion-<3.5-green)
 ![license](https://img.shields.io/badge/LICENSE-AGPL--3.0-brightgreen)
 ![author](https://img.shields.io/badge/Author-xingyujie-orange)
+### Discord: https://discord.gg/dz9HwwdSXh
+### Telegram: @binpython
 # Usage
 ```
 -h            --help               View this help
