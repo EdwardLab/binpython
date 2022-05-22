@@ -13,6 +13,7 @@
 ![author](https://img.shields.io/badge/Author-xingyujie-orange)
 ### Discord: https://discord.gg/dz9HwwdSXh
 ### Telegram: @binpython
+### Twitter: xyj_offical
 # Usage
 ```
 -h            --help               View this help
