@@ -20,8 +20,13 @@ Because:
 * no edit to registry  
 * no extra .dlls（only a single executable）  
 * licensed with AGPL-V3.0  
-* easy to integrate  
-* If you need commercial use, please contact us for authorization
+* Easy to integrate into any program, allowing any .py file to run without compiling to an executable  
+* Built-in portable IDE environment, you can enjoy the highlighted standardized IDE without downloading additional IDE 
+* Built-in portable http server for fast file transfer 
+* Built-in tkinter GUI form application framework to quickly build compile-free form applications 
+* Built-in dynamic website running framework such as tornado pywebio, the server is carried with you 
+* Support to encapsulate any library into binpython, take it with you wherever you go 
+* If you need commercial use, please contact us for authorization 
 # Usage
 ```
 -h            --help               View this help
