@@ -5,6 +5,8 @@
 </p>
 <p align="center">
 
+![Github stars](https://img.shields.io/github/stars/xingyujie/binpython.svg)
+
 # Usage
 ```
 -h            --help               View this help
