@@ -59,8 +59,11 @@ pyinstaller -F binpython.py
 ```
 ## Build BINPthon ideplus version
 (Only ideplus version (binpython-ideplus.py) 
+
 Windows: double-click "buildwin.bat" 
+
 Linux: Go to terminal and run "buildlinux.sh" bash script 
+
 (You can also use more compilation parameters, see pyinstaller documentation for details) 
 
 4. Switch to the dist directory and find the compiled executable file, such as exe or bin file 
