@@ -6,6 +6,8 @@
 <p align="center">
 
 ![Github stars](https://img.shields.io/github/stars/xingyujie/binpython.svg)
+![Discord](https://img.shields.io/badge/Discord-https://discord.gg/dz9HwwdSXh-green)
+![telegram](https://img.shields.io/badge/Telegram-@binpython-blue)
 
 # Usage
 ```
