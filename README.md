@@ -23,7 +23,7 @@ Because:
 * Easy to integrate into any program, allowing any .py file to run without compiling to an executable  
 * Built-in portable IDE environment, you can enjoy the highlighted standardized IDE without downloading additional IDE 
 * Built-in portable http server for fast file transfer 
-* Built-in tkinter GUI form application framework to quickly build compile-free form applications 
+* Built-in tkinter and turtle GUI form application framework to quickly build compile-free form applications 
 * Built-in dynamic website running framework such as tornado pywebio, the server is carried with you 
 * Support to encapsulate any library into binpython, take it with you wherever you go 
 * The program occupies a small storage space, only about 10mb
