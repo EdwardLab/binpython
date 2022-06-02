@@ -3,41 +3,31 @@
  @author xingyujie https://github.com/xingyujie
  @abstract BINPython main file
 """
-# BINPython By:XINGYUJIE AGPL-V3.0 LICENSE Release
-# Please follow the LICENSE AGPL-V3
-# ide plus version
-
-
+#BINPython By:XINGYUJIE AGPL-V3.0 LICENSE Release
+#Please follow the LICENSE AGPL-V3
+#ide plus version
 ####################################
-# build configure
+#build configure
 
+ver="0.20-releases"
+
+libs_warning="1"
+#1 is ture 0 is false.
+#Changing the value to 0 will close the prompt that the library does not exist
+
+releases_ver="offical-with-ideplus"
+importlibs="os" #Don't use "import xxx" 
+#Imported library name, please use "importlibs="<library name>" instead of "import <library name>"
+#Please note: The "importlibs" function does not support loading functions (such as from xxxx import xxxx, if necessary, please write it in the following location. However, please note that this operation may have the risk of error reporting, please report issues or solve it yourself
+#xxxxxxxxxxxxxx
+
+#from xxxx import xxxx
+#xxxxxxxxxxxxxx
+####################################
 import ctypes
-ver = "0.20-releases"
-
-libs_warning = "1"
-# 1 is ture 0 is false.
-# Changing the value to 0 will close the prompt that the library does not exist
-
-releases_ver = "offical-with-ideplus"
-importlibs = "os"  # Don't use "import xxx"
-
-# Imported library name, please use "importlibs="<library name>" instead of "import <library name>"
-# Please note: The "importlibs" function does not support loading functions (such as from xxxx import xxxx, if necessary, please write it in the following location. However, please note that this operation may have the risk of error reporting, please report issues or solve it yourself
-# xxxxxxxxxxxxxx
-
-# from xxxx import xxxx
-# xxxxxxxxxxxxxx
-apptitle = "BINPython " + ver
-####################################
-
-
-ctypes.windll.kernel32.SetConsoleTitleW(apptitle)
-
-
+ctypes.windll.kernel32.SetConsoleTitleW("BINPython " + ver)
 def self_import(name):
     __import__(name)
-
-
 try:
     self_import(importlibs)
 except ImportError:
@@ -45,32 +35,32 @@ except ImportError:
         print("Warning: Custom import library %s does not exist, please check the source code library configuration and rebuild" % importlibs)
         print("")
 try:
-    # base import
+#base import
     import getopt
     import sys
     import platform
     import os
-# fix for exit()
+#fix for exit()
     from sys import exit
-# import for http_server
+#import for http_server
     import http.server
     import socketserver
-# except ImportError:
+#except ImportError:
 except ImportError:
     print("Unable to use any library, the program does not work properly, please rebuild")
-# gui import
+#gui import
 try:
     import tkinter
     import tkinter as tk
     from tkinter import *
     import turtle
-# warning for gui
+#warning for gui
 except ImportError:
     if libs_warning == "1":
         print("Warning: Some GUI (graphical) libraries for BINPython do not exist, such as tkinter and turtle.  Because they are not built when they are built.  If you need to fix this warning, please complete the support libraries imported in the source code at build time (use pip or build it yourself), if your system does not support these libraries, you can remove or change this hint in the source code and rebuild")
         print("")
 
-# import math
+#import math
 try:
     import fractions
     import cmath
@@ -78,10 +68,10 @@ except ImportError:
     if libs_warning == "1":
         print("Warning: Some math or computation libraries for BINPython do not exist, such as fractions and cmath.  Because they weren't built when they were built.  If you need to fix this warning, please complete the support libraries imported in the source code when building (use pip or build it yourself), if your system does not support these libraries, you can remove or change this prompt in the source code and rebuild")
         print("")
-# rlcompleter
-# import for normal
+#rlcompleter
+#import for normal
 try:
-    # str
+    #str
     import rlcompleter
     import array
 except ImportError:
@@ -89,15 +79,13 @@ except ImportError:
         print("Warning: Some libraries for functions, data types, etc. for BINPython do not exist, such as rlcomplter and array.  Because they weren't built when they were built.  If you need to fix this warning, please complete the support libraries imported in the source code when building (use pip or build it yourself), if your system does not support these libraries, you can remove or change this prompt in the source code and rebuild")
         print("")
 try:
-    import filecmp
-    import tempfile
+     import filecmp
+     import tempfile
 except ImportError:
     if libs_warning == "1":
         print("Warning: Some file manipulation libraries for BINPython do not exist, such as filecmp and tempfile.  Because they weren't built when they were built.  If you need to fix this warning, please complete the support libraries imported in the source code when building (use pip or build it yourself), if your system does not support these libraries, you can remove or change this prompt in the source code and rebuild")
         print("")
-# def
-
-
+#def
 def help():
     print("[*] BINPython Help")
     print("""
@@ -109,33 +97,29 @@ def help():
 -i            --idle               Open BINPython IDLE Code Editor
 -p            --plus               Open BINPython IDE Plus Code Editor(beta) with http web server
 """)
-
-
-about = "BINPython " + ver + "-" + releases_ver + \
-    " By:XINGYUJIE[https://github.com/xingyujie/binpython] AGPL-3.0 LICENSE Release"
-# getopt
+about = "BINPython " + ver + "-" + releases_ver + " By:XINGYUJIE[https://github.com/xingyujie/binpython] AGPL-3.0 LICENSE Release"
+#getopt
 try:
-    opts, args = getopt.getopt(sys.argv[1:], '-h-f:-s:-g-i-p-e-v', ['help', 'file=', 'server=', 'gui', 'idle', 'plus', 'example', 'version'])
+    opts,args = getopt.getopt(sys.argv[1:],'-h-f:-s:-g-i-p-v',['help','file=','server=','gui','idle','plus','version'])
 except:
     print("Please check help:")
     help()
     print("The parameters you use do not exist or are not entered completely, please check help!  !  !  !  !")
-for opt_name, opt_value in opts:
-    if opt_name in ('-h', '--help'):
+for opt_name,opt_value in opts:
+    if opt_name in ('-h','--help'):
         help()
         sys.exit()
-    if opt_name in ('-v', '--version'):
-        print("BINPython " + ver + "-" + releases_ver +
-              " By:XINGYUJIE[https://github.com/xingyujie/binpython] AGPL-3.0 LICENSE Release")
+    if opt_name in ('-v','--version'):
+        print("BINPython " + ver + "-" + releases_ver + " By:XINGYUJIE[https://github.com/xingyujie/binpython] AGPL-3.0 LICENSE Release")
         print("Python " + platform.python_version())
         exit()
-    if opt_name in ('-f', '--file'):
+    if opt_name in ('-f','--file'):
         file = opt_value
-        f = open(file, encoding="utf-8")
+        f = open(file,encoding = "utf-8")
         exec(f.read())
         input("Please enter to continue")
         sys.exit()
-    if opt_name in ('-s', '--server'):
+    if opt_name in ('-s','--server'):
         server_port = opt_value
         print("""
 PORT = """ + server_port + """
@@ -146,120 +130,45 @@ with socketserver.TCPServer(("", PORT), Handler) as httpd:
     print("serving at port", PORT)
     httpd.serve_forever()
 """)
-    if opt_name in ('-g', '--gui'):
+    if opt_name in ('-g','--gui'):
         from tkinter import *
         root = Tk()
         root.title("Welcome to BINPython")
-        root.geometry('1600x1300')
-        text = Text(root, width=35, heigh=15)
+        root.geometry('600x300')
+        text =Text(root, width=35, heigh=15)
         text.pack()
         text.insert("insert", "BINPython" + about)
         print(text.get("1.3", "1.end"))
         ####
-        text = Label(root, text="Welcome to BINPython" + ver,
-                     bg="yellow", fg="red", font=('Times', 20, 'bold italic'))
+        text=Label(root,text="Welcome to BINPython" + ver,bg="yellow",fg="red",font=('Times', 20, 'bold italic'))
         text.pack()
-        button = Button(root, text="EXIT", command=root.quit)
+        button=Button(root,text="EXIT",command=root.quit)
         button.pack(side="bottom")
         root.mainloop()
         sys.exit()
-
     def show():
         os.system('cls' if os.name == 'nt' else 'clear')
         print("<<<<<<<<<<START>>>>>>>>>>")
         exec(e1.get(1.0, END))
-    if opt_name in ('-i', '--idle'):
+    if opt_name in ('-i','--idle'):
         import tkinter as tk
         from tkinter import *
         import os
         master = tk.Tk()
         master.title("BINPython IDLE")
-
+        
+ 
         tk.Label(master, text="Type Code", height=5).grid(row=0)
-
+ 
         e1 = Text(master,
-                  width=150,
-                  height=40,)
-
+            width=150,
+            height=40,)
+        
         e1.grid(row=0, column=1, padx=10, pady=5)
-        tk.Button(master, text="Run", width=10, command=show).grid(
-            row=3, column=0, sticky="w", padx=10, pady=5)
-        tk.Button(master, text="EXIT", width=10, command=master.quit).grid(
-            row=3, column=1, sticky="e", padx=10, pady=5)
+        tk.Button(master, text="Run", width=10, command=show).grid(row=3, column=0, sticky="w", padx=10, pady=5)
+        tk.Button(master, text="EXIT", width=10, command=master.quit).grid(row=3, column=1, sticky="e", padx=10, pady=5)
         master.mainloop()
-
-    if opt_name in ('-e', '--example'):
-        examplecodenotice = "Here is the source code:"
-        examplehelloworld = """
-helloworldnameinput = input("What's your name?")
-print("Hello world! Hello BINPython! Hello " + helloworldnameinput)
-        """
-        exampleturtle = """
-from turtle import *
-title("BINPython turtle example")
-color("red", "yellow")
-speed(10)
-begin_fill()
-for x in range(50):
-    forward(200)
-    left(170)
-end_fill()
-done()"""
-        exampletkinter = """ 
-import tkinter as tk
-app = tk.Tk()
-app.title('BINPython tkinter example')
-theLabel = tk.Label(app, text='BINPython Tkinter Example') 
-theLabel.pack() 
-app.mainloop()"""
-        examplerequests = """
-import requests
-res = requests.get('http://bing.com')
-print(res.text)  
-        """
-        examplepywebio = """
-from pywebio import *
-
-def main():
-    name = input.input("what's your name")
-    output.put_text("Hello BINPython, Hello ", name)
-
-start_server(main, port=8080, debug=True)
-        """
-        print("BINPython application example")
-        print("LIST:")
-        print("""
-        1. Hello World
-        2. turtle drawing demo
-        3. Tkinter demo
-        4. HTTP Requests
-        5. PyWebIO demo
-        """)
-
-    examplenum = input("Enter example number to run(like:1): ")
-#do sth
-
-    if examplenum == '1':
-            exec(examplehelloworld)
-            print(examplecodenotice)
-            print(examplehelloworld)
-    if examplenum == '2':
-            exec(exampleturtle)
-            print(examplecodenotice)
-            print(exampleturtle)
-    if examplenum == '3':
-            exec(exampletkinter)
-            print(examplecodenotice)
-            print(exampletkinter)
-    if examplenum == '4':
-            exec(examplerequests)
-            print(examplecodenotice)
-            print(examplerequests)
-    if examplenum == '5':
-            exec(examplepywebio)
-            print(examplecodenotice)
-            print(examplepywebio)
-    if opt_name in ('-p', '--plus'):
+    if opt_name in ('-p','--plus'):
         serverport = input("Please enter server port(like 8080): ")
         import pywebio.input
         from pywebio.input import *
@@ -271,56 +180,50 @@ start_server(main, port=8080, debug=True)
         import os
         print("______________________________________")
         print("BINPython WEB IDE STARTED")
-       # IDE Plus main
-
+        #IDE Plus main
         def main():
             set_env(title="BINPython IDE Plus", auto_scroll_bottom=True)
             put_html("<h1>BINPython IDE Plus</h1>")
             put_text('Welcome to BINPython IDE Plus, Please type code',
-                     sep=' '
-                     )
-            toast(
-                "BINPython IDE Plus is a beta version. May be removed or changed in the future")
+                    sep=' '
+                )
+            toast("BINPython IDE Plus is a beta version. May be removed or changed in the future")
             put_text('_______________________',
-                     sep=' '
-                     )
+                    sep=' '
+                )
             res = textarea('BINPython IDE Plus', rows=45, code={
-                'mode': "python",
-                'theme': 'darcula'
-            })
+            'mode': "python",
+            'theme': 'darcula'
+                })
             exec(res)
             toast("Run finished!")
             put_success("Finished, Please see BINPython Window or Terminal")
             put_text("Here is the code you wrote")
             put_code(res, language='python')
-            savecodefilename = pywebio.input.input(
-                'Do you want to save the code you wrote to a file? Enter a filename and save it')
+            savecodefilename = pywebio.input.input('Do you want to save the code you wrote to a file? Enter a filename and save it')
             f = open(savecodefilename, 'wb+')
             f.write(res.encode("utf-8"))
             toast("Successfully saved")
-            put_success("The save is successful, and the code is saved to binpython file path" +
-                        " \nThe file name is " + '"' + savecodefilename + '"')
+            put_success("The save is successful, and the code is saved to binpython file path" + " \nThe file name is " + '"' + savecodefilename + '"')
         if __name__ == '__main__':
-            start_server(main, debug=True, host='0.0.0.0', port=serverport)
+            start_server(main, debug=True, host='0.0.0.0', port= serverport)
             pywebio.session.hold()
-binpywelcome = "BINPython " + ver + "-" + releases_ver + " (Python Version:" + platform.python_version() +")By:XINGYUJIE https://github.com/xingyujie/binpython[Running on " + platform.platform() + " " + platform.version() + "]"
-binpynotice = 'Type "about", "help", "copyright", "credits" or "license" for more information.'
+       
 
-# main BINPython
-print(binpywelcome)
-print(binpynotice)
+#main BINPython
+
+print("BINPython " + ver + "-" + releases_ver + " (Python Version:" + platform.python_version() + ")By:XINGYUJIE https://github.com/xingyujie/binpython[Running on " + platform.platform() + " " + platform.version() + "]")
+print('Type "about", "help", "copyright", "credits" or "license" for more information.')
 try:
     while True:
-        pycmd = input(">>> ")
+        pycmd=input(">>> ")
         if pycmd in globals().keys():
             print(globals()[pycmd])
             continue
         elif pycmd == 'about':
-            print(
-                "BINPython By:XINGYUJIE[https://github.com/xingyujie] AGPL-3.0 LICENSE Release")
+            print("BINPython By:XINGYUJIE[https://github.com/xingyujie] AGPL-3.0 LICENSE Release")
         elif pycmd == 'help':
-            print(
-                "Type help() for interactive help, or help(object) for help about object.")
+            print("Type help() for interactive help, or help(object) for help about object.")
         elif pycmd == 'copyright':
             print("""
 Copyright (c) 2001-2022 Python Software Foundation and BINPython xingyujie(https://github.com/xingyujie/binpython).
@@ -349,3 +252,4 @@ Thanks to CWI, CNRI, BeOpen.com, Zope Corporation and a cast of thousands
 except KeyboardInterrupt:
     print("EXIT!")
     sys.exit()
+
