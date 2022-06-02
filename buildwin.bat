@@ -1,1 +1,1 @@
-pyinstaller --onefile binpython-ideplus.spec
+pyinstaller --onefile binpythonfull.spec
