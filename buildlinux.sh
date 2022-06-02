@@ -1,1 +1,1 @@
-pyinstaller --onefile binpythonfull.spec
+pyinstaller binpythonfull.spec

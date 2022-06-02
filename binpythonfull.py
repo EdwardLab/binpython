@@ -42,15 +42,18 @@ def binpython_releases_ver():
 
 def binpython_build_importlibs():
     print(importlibs)
+import platform
+sys = platform.system()
 
-def setwindowtitle(titlename):
-    import ctypes
-    ctypes.windll.kernel32.SetConsoleTitleW(titlename)
+if sys == "Windows":
+    def setwindowtitle(titlename):
+        import ctypes
+        ctypes.windll.kernel32.SetConsoleTitleW(titlename)
 def binpythonallconf():
     print("ver: " + ver + " buildversion: " + buildversion + " libs_warning settings:" + libs_warning + " releases full version: " + releases_ver + " custom library that has been build: " + importlibs)
-import ctypes
-
-ctypes.windll.kernel32.SetConsoleTitleW("BINPython " + ver)
+if sys == "Windows":
+    import ctypes
+    ctypes.windll.kernel32.SetConsoleTitleW("BINPython " + ver)
 def self_import(name):
     __import__(name)
 try:
