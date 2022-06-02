@@ -187,7 +187,6 @@ for opt_name,opt_value in opts:
     if opt_name in ('-h','--help'):
         
         print(helpinfobase)
-        print("Standard options")
         if buildversion == "plus":
             print("Additional options for the plus version")
             print(helpinfoplus)
