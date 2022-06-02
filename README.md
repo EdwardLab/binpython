@@ -31,13 +31,21 @@ Because:
 * If you need commercial use, please contact us for authorization 
 # Usage
 ```
+Usage: binpython [OPTIONS]
+
+Options:
+
 -h            --help               View this help
 -f <filename> --file=<filename>    Enter Python Filename and run (*.py)
 -s <port>     --server=<port>      Start a simple web server that supports html and file transfer (http.server)
 -v            --version            View BINPython Version
 -g            --gui                View GUI About and build info
 -i            --idle               Open BINPython IDLE Code Editor
+
+Additional options for the plus version
+
 -p            --plus               Open BINPython IDE Plus Code Editor(beta) with http web server
+-e            --example            Run various code examples through BINPython
 ```
 # Build
 
@@ -54,18 +62,13 @@ pip install pyinstaller
 The standard version is for integration into programs.  It is recommended to use the ideplus version for learning 
 
 ## Build BINPthon Standard version
-Compile with basic pyinstaller, e.g.(Only standard version(binpython.py)) 
 ```bash
-pyinstaller -F binpython.py
-```
-## Build BINPthon ideplus version
-(Only ideplus version (binpython-ideplus.py) 
-
 Windows: double-click "buildwin.bat" 
 
 Linux: Go to terminal and run "buildlinux.sh" bash script 
 
 (You can also use more compilation parameters, see pyinstaller documentation for details) 
+```
 
 4. Switch to the dist directory and find the compiled executable file, such as exe or bin file 
 # Use
