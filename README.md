@@ -28,7 +28,6 @@ Because:
 * Built-in dynamic website running framework such as tornado pywebio, the server is carried with you 
 * Support to encapsulate any library into BINPython, take it with you wherever you go 
 * The program occupies a small storage space, only about 10mb
-* If you need commercial use, please contact us for authorization 
 # Usage
 ```
 Usage: binpython [OPTIONS]
