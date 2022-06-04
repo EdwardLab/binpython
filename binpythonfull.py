@@ -178,7 +178,7 @@ helpinfoplus = """
 about = "BINPython " + ver + "-" + releases_ver + " By:XINGYUJIE[https://github.com/xingyujie/binpython] AGPL-3.0 LICENSE Release"
 #getopt
 try:
-    opts,args = getopt.getopt(sys.argv[1:],'-h-f:-s:-g-i-p-v',['help','file=','server=','gui','idle','plus','version'])
+    opts,args = getopt.getopt(sys.argv[1:],'-h-f:-s:-g-i-p-e-v',['help','file=','server=','gui','idle','plus','example','version'])
 except:
     print("Please check help:")
     help()
@@ -203,7 +203,7 @@ for opt_name,opt_value in opts:
         sys.exit()
     if opt_name in ('-s','--server'):
         server_port = opt_value
-        print("""
+        exec("""
 PORT = """ + server_port + """
 
 Handler = http.server.SimpleHTTPRequestHandler
@@ -288,8 +288,106 @@ with socketserver.TCPServer(("", PORT), Handler) as httpd:
             toast("Successfully saved")
             put_success("The save is successful, and the code is saved to binpython file path" + " \nThe file name is " + '"' + savecodefilename + '"')
         if __name__ == '__main__':
-            start_server(main, debug=True, host='0.0.0.0', port= serverport)
+            start_server(main, debug=True, port= serverport)
             pywebio.session.hold()
-       
+    if opt_name in ('-e','--example'):
+        print("Welcome to BINPython example")
+        print("""
+List of examples:
+1.Turtle
+2.Tkinter GUI
+3.Tornado WEB Server
+4.PywebIO WEB
+5.Hello World
+6.HTTP requests
+7.BINPython() function example
+
+        """)
+        examplenum = input("Please enter the option you want to enter(like 1):")
+        if examplenum == "1":
+            def exampleturtle():
+                import turtle
+                import time
+                turtle.speed(10)
+                turtle.color("red", "yellow")
+                turtle.begin_fill()
+                for _ in range(50):
+                    turtle.forward(200)
+                    turtle.left(170)
+                turtle.end_fill()
+                turtle.done()
+            exampleturtle()
+            sys.exit()
+        if examplenum == "2":
+            def exampletkinter():
+                import tkinter as tk
+                app = tk.Tk()
+                app.title('BINPython tkinter example')
+                theLabel = tk.Label(app, text='Welcome to BINPython!!!') 
+                theLabel.pack()
+                app.mainloop()
+            exampletkinter()
+            sys.exit()
+        if examplenum == "3":
+            def exampletornado():
+                import asyncio
+                import tornado.web
+                class MainHandler(tornado.web.RequestHandler):
+                    def get(self):
+                        self.write("Hello, BINPython!")
+                def make_app():
+                    return tornado.web.Application([
+                        (r"/", MainHandler),
+                    ])
+                async def main():
+                    app = make_app()
+                    app.listen(8080)
+                    await asyncio.Event().wait()
+                if __name__ == "__main__":
+                    asyncio.run(main())
+                    exit()
+            print("Server Started listen on port:8080(http://ip:8080)")
+            exampletornado()
+            sys.exit()
+        if examplenum == "4":
+            import pywebio.input
+            from pywebio.input import *
+            from pywebio.output import *
+            from pywebio import *
+            from pywebio.session import *
+            print("Listen on port 9000(http://ip:9000)")
+            def examplepywebio():
+                def main():
+                    set_env(title="Welcome to BINPython", auto_scroll_bottom=True)
+                    put_html("<h1>Welcome to BINPython</h1>")
+                if __name__ == '__main__':
+                    start_server(main, debug=True, host='0.0.0.0', port='9000')
+                    pywebio.session.hold()
+            examplepywebio()
+            sys.exit()
+        if examplenum == "5":
+            setwindowtitle("Hi, Welcome to BINPython")
+            name = input("hi...What's your name:")
+            print("hi," + name)
+            sys.exit()
+        if examplenum == "6":
+            import requests
+            def examplerequests():
+                print(requests.get("http://google.com"))
+            examplerequests()
+            sys.exit()
+        if examplenum == "7":
+            print("BINPython() function example")
+            import time
+            binpython_ver()
+            binpython_buildversion()
+            binpython_libs_warning()
+            binpython_build_importlibs()
+            setwindowtitle("Title name(str)")
+            binpythonallconf()
+            time.sleep(5)
+            #main shell
+            binpython_shell()
+            sys.exit()
 #go main shell
 binpython_shell()
