@@ -9,7 +9,7 @@
 ####################################
 #build configure
 
-ver="0.23-releases-full"
+ver="0.25-devbuild-full"
 
 libs_warning="1"
 #1 is ture 0 is false.
@@ -114,10 +114,10 @@ except ImportError:
         print("Warning: Some file manipulation libraries for BINPython do not exist, such as filecmp and tempfile.  Because they weren't built when they were built.  If you need to fix this warning, please complete the support libraries imported in the source code when building (use pip or build it yourself), if your system does not support these libraries, you can remove or change this prompt in the source code and rebuild")
         print("")
 #main BINPython
-
-def binpython_shell():
+def binpython_welcome_text():
     print("BINPython " + ver + "-" + releases_ver + " (Python Version:" + platform.python_version() + ")By:XINGYUJIE https://github.com/xingyujie/binpython[Running on " + platform.platform() + " " + platform.version() + "]")
     print('Type "about", "help", "copyright", "credits" or "license" for more information.')
+def binpython_shell():
     try:
         while True:
             pycmd=input(">>> ")
@@ -185,16 +185,24 @@ except:
     print("The parameters you use do not exist or are not entered completely, please check help!  !  !  !  !")
 for opt_name,opt_value in opts:
     if opt_name in ('-h','--help'):
-        
-        print(helpinfobase)
-        if buildversion == "plus":
-            print("Additional options for the plus version")
-            print(helpinfoplus)
+        try:
+            f = open("binpython_config/help.txt",encoding = "utf-8")
+            print(f.read())
+        except:
+            print(helpinfobase)
+            if buildversion == "plus":
+                print("Additional options for the plus version")
+                print(helpinfoplus)
         sys.exit()
     if opt_name in ('-v','--version'):
-        print("BINPython " + ver + "-" + releases_ver + " By:XINGYUJIE[https://github.com/xingyujie/binpython] AGPL-3.0 LICENSE Release")
-        print("Python " + platform.python_version())
-        exit()
+        try:
+            f = open("binpython_config/version.py",encoding = "utf-8")
+            exec(f.read())
+            print("Powered by: BINPython[https://github.com/xingyujie/binpython] AGPL 3.0")
+        except:
+            print("BINPython " + ver + "-" + releases_ver + " By:XINGYUJIE[https://github.com/xingyujie/binpython] AGPL-3.0 LICENSE Release")
+            print("Python " + platform.python_version())
+        sys.exit()
     if opt_name in ('-f','--file'):
         file = opt_value
         f = open(file,encoding = "utf-8")
@@ -235,7 +243,6 @@ with socketserver.TCPServer(("", PORT), Handler) as httpd:
     if opt_name in ('-i','--idle'):
         import tkinter as tk
         from tkinter import *
-        import os
         master = tk.Tk()
         master.title("BINPython IDLE")
         
@@ -390,4 +397,10 @@ List of examples:
             binpython_shell()
             sys.exit()
 #go main shell
+try:
+    f = open("binpython_config/welcome.py",encoding = "utf-8")
+    exec(f.read())
+    print("Powered by: BINPython[https://github.com/xingyujie/binpython] AGPL 3.0")
+except:
+    binpython_welcome_text()
 binpython_shell()
