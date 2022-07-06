@@ -9,7 +9,7 @@
 ####################################
 #build configure
 
-ver="0.25-devbuild-full"
+ver="0.28-dev-full"
 
 libs_warning="1"
 #1 is ture 0 is false.
@@ -257,6 +257,7 @@ with socketserver.TCPServer(("", PORT), Handler) as httpd:
         tk.Button(master, text="Run", width=10, command=show).grid(row=3, column=0, sticky="w", padx=10, pady=5)
         tk.Button(master, text="EXIT", width=10, command=master.quit).grid(row=3, column=1, sticky="e", padx=10, pady=5)
         master.mainloop()
+        sys.exit()
     if opt_name in ('-p','--plus'):
         serverport = input("Please enter server port(like 8080): ")
         import pywebio.input
@@ -403,4 +404,33 @@ try:
     print("Powered by: BINPython[https://github.com/xingyujie/binpython] AGPL 3.0")
 except:
     binpython_welcome_text()
-binpython_shell()
+try:
+    f = open("binpython_debug",encoding = "utf-8")
+    print("Debug mode:on")
+    print("BINPython debug INFO")
+    #coding=utf-8
+
+    def TestPlatform():
+        import platform
+        print(platform.python_version())
+        print(platform.architecture())
+        print(platform.node())
+        print(platform.platform())
+        print(platform.processor())
+        print(platform.python_build())
+        print(platform.python_compiler())
+        print(platform.python_implementation())
+        print(platform.python_revision())
+        print(platform.release())
+        print(platform.system())
+        print(platform.version())
+        print(platform.uname())
+    TestPlatform()
+except:
+    binpython_welcome_text()
+try:
+    filename = open("startupfile.conf",encoding = "utf-8")
+    startupcode = open(filename.read(),encoding = "utf-8")
+    exec(startupcode.read())
+except:
+    binpython_shell()
