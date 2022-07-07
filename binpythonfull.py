@@ -9,16 +9,16 @@
 ####################################
 #build configure
 
-ver="0.28-dev-full"
+ver="0.28-releases-full"
 
 libs_warning="1"
 #1 is ture 0 is false.
 #Changing the value to 0 will close the prompt that the library does not exist
 
-
 buildversion = "plus" #plus version and standard version
 
 releases_ver="offical" + buildversion + "-building"
+
 importlibs="os" #Don't use "import xxx" 
 #Imported library name, please use "importlibs="<library name>" instead of "import <library name>"
 #Please note: The "importlibs" function does not support loading functions (such as from xxxx import xxxx, if necessary, please write it in the following location. However, please note that this operation may have the risk of error reporting, please report issues or solve it yourself
@@ -82,6 +82,11 @@ try:
     import tkinter as tk
     from tkinter import *
     import turtle
+    def importpygame():
+        import pygame
+        import pygame.locals
+        import pyglet
+    null = importpygame
 #warning for gui
 except ImportError:
     if libs_warning == "1":
@@ -130,7 +135,10 @@ def binpython_shell():
                 print("Type help() for interactive help, or help(object) for help about object.")
             elif pycmd == 'copyright':
                 print("""
-Copyright (c) 2001-2022 Python Software Foundation and BINPython xingyujie(https://github.com/xingyujie/binpython).
+Copyright (c) 2022 BINPython xingyujie(https://github.com/xingyujie/binpython).
+All Rights Reserved.
+
+Copyright (c) 2001-2022 Python Software Foundation.
 All Rights Reserved.
 
 Copyright (c) 2000 BeOpen.com.
@@ -427,7 +435,7 @@ try:
         print(platform.uname())
     TestPlatform()
 except:
-    binpython_welcome_text()
+    pass
 try:
     filename = open("startupfile.conf",encoding = "utf-8")
     startupcode = open(filename.read(),encoding = "utf-8")
