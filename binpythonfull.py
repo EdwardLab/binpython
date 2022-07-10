@@ -135,9 +135,6 @@ def binpython_shell():
                 print("Type help() for interactive help, or help(object) for help about object.")
             elif pycmd == 'copyright':
                 print("""
-Copyright (c) 2022 BINPython xingyujie(https://github.com/xingyujie/binpython).
-All Rights Reserved.
-
 Copyright (c) 2001-2022 Python Software Foundation.
 All Rights Reserved.
 
