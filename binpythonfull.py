@@ -123,8 +123,8 @@ def binpython_welcome_text():
     print("BINPython " + ver + "-" + releases_ver + " (Python Version:" + platform.python_version() + ")By:XINGYUJIE https://github.com/xingyujie/binpython[Running on " + platform.platform() + " " + platform.version() + "]")
     print('Type "about", "help", "copyright", "credits" or "license" for more information.')
 def binpython_shell():
-    try:
-        while True:
+    while True:
+        try:
             pycmd=input(">>> ")
             if pycmd in globals().keys():
                 print(globals()[pycmd])
@@ -157,13 +157,13 @@ Thanks to CWI, CNRI, BeOpen.com, Zope Corporation and a cast of thousands
     """)
             elif pycmd == 'license':
                 print("Type license() to see the full license text")
-            try:
+            else:
                 exec(pycmd)
-            except Exception as err:
-                print(err)
-    except KeyboardInterrupt:
-        print("EXIT!")
-        sys.exit()
+        except KeyboardInterrupt:
+            print("EXIT!")
+            sys.exit()
+        except Exception as err:
+            print(err)
 
 
 #def
