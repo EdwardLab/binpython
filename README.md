@@ -9,7 +9,7 @@
 ![Github stars](https://img.shields.io/github/stars/xingyujie/binpython.svg)
 ![Discord](https://img.shields.io/badge/Discord-https://discord.gg/dz9HwwdSXh-green)
 ![telegram](https://img.shields.io/badge/Telegram-@binpython-blue)
-![pyver](https://img.shields.io/badge/PythonVersion-<3.5-green)
+![pyver](https://img.shields.io/badge/PythonVersion->3.5-green)
 ![license](https://img.shields.io/badge/LICENSE-AGPL--3.0-brightgreen)
 ![author](https://img.shields.io/badge/Author-xingyujie-orange)
 ### Discord: https://discord.gg/dz9HwwdSXh
