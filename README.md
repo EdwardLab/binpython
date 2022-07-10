@@ -72,3 +72,9 @@ Linux: Go to terminal and run "buildlinux.sh" bash script
 4. Switch to the dist directory and find the compiled executable file, such as exe or bin file 
 # Use
 Under most Unix-like systems, run "./binpython" to run, double-click to run under Windows
+
+## Configuration files and default startup configuration
+
+Create "startup.conf" in the same level directory, the content of the file is the default startup Python script, such as "startupfile.py", the next time you open binpython, the startup script configured in "startup.conf" will be started by default 
+
+Create "binpython_config" folder including "welcome.py", "version.py", "help.txt", put the startup script every time binpython is opened in "welcome.py", "version.py" will  Displayed when the --help parameter is used, "help.txt" is put into the display text when the -h parameter is used.  If one of the above files is missing or not configured, the default script and text for binpython will be displayed 
