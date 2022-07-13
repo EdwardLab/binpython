@@ -9,7 +9,7 @@
 ####################################
 #build configure
 
-ver="0.28-releases-full"
+ver="0.29-dev-full"
 
 libs_warning="1"
 #1 is ture 0 is false.
@@ -68,6 +68,7 @@ try:
     import sys
     import platform
     import os
+    import timeit
 #fix for exit()
     from sys import exit
 #import for http_server
@@ -101,12 +102,12 @@ except ImportError:
     if libs_warning == "1":
         print("Warning: Some math or computation libraries for BINPython do not exist, such as fractions and cmath.  Because they weren't built when they were built.  If you need to fix this warning, please complete the support libraries imported in the source code when building (use pip or build it yourself), if your system does not support these libraries, you can remove or change this prompt in the source code and rebuild")
         print("")
-#rlcompleter
 #import for normal
 try:
     #str
     import rlcompleter
     import array
+    import xlrd
 except ImportError:
     if libs_warning == "1":
         print("Warning: Some libraries for functions, data types, etc. for BINPython do not exist, such as rlcomplter and array.  Because they weren't built when they were built.  If you need to fix this warning, please complete the support libraries imported in the source code when building (use pip or build it yourself), if your system does not support these libraries, you can remove or change this prompt in the source code and rebuild")
@@ -267,7 +268,6 @@ with socketserver.TCPServer(("", PORT), Handler) as httpd:
         master.mainloop()
         sys.exit()
     if opt_name in ('-p','--plus'):
-        serverport = input("Please enter server port(like 8080): ")
         import pywebio.input
         from pywebio.input import *
         from pywebio.output import *
@@ -276,19 +276,110 @@ with socketserver.TCPServer(("", PORT), Handler) as httpd:
         import sys
         import subprocess
         import os
+        import webbrowser
         print("______________________________________")
         print("BINPython WEB IDE STARTED")
+        print("""
+Welcome to BINPython IDEPlus!
+The service starts on port 22948 (http), the program will automatically open the browser, if not, please manually open http://localhost:22948 in the browser
+""")
+        webbrowser.open("http://localhost:22940")
         #IDE Plus main
-        def main():
+        def line():
+            put_text('_______________________',
+                sep=' '
+            )
+        def head():
+            set_env(title="BINPython IDE Plus", auto_scroll_bottom=True)
+            put_html("""
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <a class="navbar-brand" href="http://localhost:22940"></a>
+    <img src="https://github.com/xingyujie/binpython/blob/main/py.ico?raw=true" width="30" height="30" class="d-inline-block align-top" alt="">
+    BINPython IDEPlus
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item">
+        <a class="nav-link active" aria-current="page" href="http://localhost:22940/">Home</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="http://localhost:22940/?app=ideplus">IDEPlus</a>
+      </li>
+        </a>
+    </ul>
+  </div>
+</nav>
+
+""")
+        def plushead():
+            set_env(title="BINPython IDE Plus", auto_scroll_bottom=True)
+            put_html("""
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <a class="navbar-brand" href="http://localhost:22940"></a>
+    <img src="https://github.com/xingyujie/binpython/blob/main/py.ico?raw=true" width="30" height="30" class="d-inline-block align-top" alt="">
+    BINPython IDEPlus
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item">
+        <a class="nav-link" href="http://localhost:22940/">Home</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link active" aria-current="page" href="http://localhost:22940/?app=ideplus">IDEPlus</a>
+      </li>
+        </a>
+    </ul>
+  </div>
+</nav>
+
+""")
+        def aboutideplus():
+            head()
+            put_markdown("## About BINPython IDEPlus")
+            put_markdown("""
+BINPython is made by:
+
+[xingyujie(Edward Hsing)](https://github.com/xingyujie)
+
+AGPL-V3.0 Release
+
+""")
+        def welcomecard():
+            put_html("""
+  <div class="jumbotron">
+  <h1 class="display-3">Welcome to BINPython!</h1>
+  <p class="lead">This is a portable IDE environment for BINPython</p>
+  <hr class="my-4">
+  <p>Fast and portable, runs via BINPython</p>
+  <p class="lead">
+    <a class="btn btn-primary btn-lg" href="http://localhost:22940/?app=ideplus" role="button">Try IDE Plus!</a>
+  </p>
+</div>
+""")
+        def index():
+            head()
+            welcomecard()
+            put_markdown("## Features")
+            put_link("IDEPlus", url='http://localhost:22940/?app=ideplus')
+            line()
+            put_link("About BINPython", url='http://localhost:22940/?app=aboutideplus')
+            line()
+            put_link("View Code", url='http://localhost:22940/?app=viewcode')
+        def idehead():
             set_env(title="BINPython IDE Plus", auto_scroll_bottom=True)
             put_html("<h1>BINPython IDE Plus</h1>")
             put_text('Welcome to BINPython IDE Plus, Please type code',
                     sep=' '
                 )
+            line()
             toast("BINPython IDE Plus is a beta version. May be removed or changed in the future")
-            put_text('_______________________',
-                sep=' '
-            )
+        def ideplus():
+            plushead()
+            idehead()
             res = textarea('BINPython IDE Plus', rows=45, code={
             'mode': "python",
             'theme': 'darcula'
@@ -303,8 +394,13 @@ with socketserver.TCPServer(("", PORT), Handler) as httpd:
             f.write(res.encode("utf-8"))
             toast("Successfully saved")
             put_success("The save is successful, and the code is saved to binpython file path" + " \nThe file name is " + '"' + savecodefilename + '"')
+        def viewcode():
+            plushead()
+            viewcode_code = pywebio.input.input("Please input file path:")
+            f = open(viewcode_code,encoding = "utf-8")
+            put_code(f.read(), language='python')
         if __name__ == '__main__':
-            start_server(main, debug=True, port= serverport)
+            start_server([index, ideplus, aboutideplus, viewcode], debug=True, port= 22940)
             pywebio.session.hold()
     if opt_name in ('-e','--example'):
         print("Welcome to BINPython example")
@@ -416,8 +512,6 @@ try:
     f = open("binpython_debug",encoding = "utf-8")
     print("Debug mode:on")
     print("BINPython debug INFO")
-    #coding=utf-8
-
     def TestPlatform():
         import platform
         print(platform.python_version())

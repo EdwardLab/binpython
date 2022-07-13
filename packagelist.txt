@@ -1,5 +1,4 @@
 pygame
 pyinstaller
-turtle
 pywebio
 torondo
