@@ -10,7 +10,7 @@
 ####################################
 #build configure
 
-ver="0.30-dev-full"
+ver="0.31-canary-full"
 
 libs_warning="1"
 #1 is ture 0 is false.
@@ -545,9 +545,46 @@ try:
     TestPlatform()
 except:
     pass
+
+#plugin start
+plugin_name = ''
+def binpython_plugin_name(key):
+    global plugin_name
+    plugin_name = key
+#print(plugin_name)
+plugin_anthor = ''
+def binpython_plugin_anthor(key):
+    global plugin_anthor
+    plugin_anthor = key
+#description
+plugin_description = ''
+def binpython_plugin_description(key):
+    global plugin_description
+    plugin_description = key
+def binpython_plugin_showinfo():
+    print("BINPython Plugin Info:")
+    print("Plugin Name: " + plugin_name)
+    print("Plugin Anthor: " + plugin_anthor)
+    print("Plugin description: " + plugin_description)
+
+
+plugin_loadmain = ''
+def binpython_plugin_loadmain(key):
+    global plugin_loadmain
+    plugin_loadmain = key
+#binpython_plugin_loadmain("function.py")
+try:
+    f = open("binpython_plugin/pluginconfig.binpython",encoding = "utf-8")
+    exec(f.read())
+    f = open("binpython_plugin/" + plugin_loadmain,encoding = "utf-8")
+    exec(f.read())
+    binpython_shell()
+except:
+    pass
 try:
     filename = open("startupfile.conf",encoding = "utf-8")
     startupcode = open(filename.read(),encoding = "utf-8")
     exec(startupcode.read())
 except:
     binpython_shell()
+binpython_shell()
