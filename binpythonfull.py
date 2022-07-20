@@ -3,13 +3,14 @@
  @author xingyujie https://github.com/xingyujie
  @abstract BINPython main file
 """
+
 #BINPython By:XINGYUJIE AGPL-V3.0 LICENSE Release
 #Please follow the LICENSE AGPL-V3
 #full version
 ####################################
 #build configure
 
-ver="0.29-dev-full"
+ver="0.30-dev-full"
 
 libs_warning="1"
 #1 is ture 0 is false.
@@ -62,6 +63,13 @@ except ImportError:
     if libs_warning == "1":
         print("Warning: Custom import library %s does not exist, please check the source code library configuration and rebuild" % importlibs)
         print("")
+def optreadfile():
+    import sys
+    getfile = sys.argv[1]
+    getfilecode = open(getfile,encoding = "utf-8")
+    exec(getfilecode.read())
+    input("Run finished. Enter to Shell.")
+    sys.exit(0)
 try:
 #base import
     import getopt
@@ -69,6 +77,7 @@ try:
     import platform
     import os
     import timeit
+    import pdb
 #fix for exit()
     from sys import exit
 #import for http_server
@@ -158,10 +167,17 @@ Thanks to CWI, CNRI, BeOpen.com, Zope Corporation and a cast of thousands
             else:
                 exec(pycmd)
         except KeyboardInterrupt:
-            print("EXIT!")
+            print("KeyboardInterrupt")
             sys.exit()
         except Exception as err:
             print(err)
+try:
+    optreadfile()
+except:
+    pass
+
+
+
 
 
 #def
@@ -169,9 +185,9 @@ helpinfobase = """
 Usage: binpython [OPTIONS]
 
 Options:
-
+<filename>                         Enter Python Filename and run (*.py)
+-f            --file               Enter Python Filename and run (*.py), But this options is no Run finished prompt
 -h            --help               View this help
--f <filename> --file=<filename>    Enter Python Filename and run (*.py)
 -s <port>     --server=<port>      Start a simple web server that supports html and file transfer (http.server)
 -v            --version            View BINPython Version
 -g            --gui                View GUI About and build info
@@ -181,24 +197,27 @@ helpinfoplus = """
 -p            --plus               Open BINPython IDE Plus Code Editor(beta) with http web server
 -e            --example            Run various code examples through BINPython
 """
+def outputfullhelp():
+    try:
+        f = open("binpython_config/help.txt",encoding = "utf-8")
+        print(f.read())
+    except:
+        print(helpinfobase)
+        if buildversion == "plus":
+            print("Additional options for the plus version")
+            print(helpinfoplus)
 about = "BINPython " + ver + "-" + releases_ver + " By:XINGYUJIE[https://github.com/xingyujie/binpython] AGPL-3.0 LICENSE Release"
 #getopt
 try:
     opts,args = getopt.getopt(sys.argv[1:],'-h-f:-s:-g-i-p-e-v',['help','file=','server=','gui','idle','plus','example','version'])
-except:
+except getopt.GetoptError as err:
     print("Please check help:")
-    help()
-    print("The parameters you use do not exist or are not entered completely, please check help!  !  !  !  !")
+    print("The parameters you use do not exist or are not entered completely, please check help!!!!")
+    outputfullhelp()
+    sys.exit()
 for opt_name,opt_value in opts:
     if opt_name in ('-h','--help'):
-        try:
-            f = open("binpython_config/help.txt",encoding = "utf-8")
-            print(f.read())
-        except:
-            print(helpinfobase)
-            if buildversion == "plus":
-                print("Additional options for the plus version")
-                print(helpinfoplus)
+        outputfullhelp()
         sys.exit()
     if opt_name in ('-v','--version'):
         try:
@@ -213,7 +232,6 @@ for opt_name,opt_value in opts:
         file = opt_value
         f = open(file,encoding = "utf-8")
         exec(f.read())
-        input("Please enter to continue")
         sys.exit()
     if opt_name in ('-s','--server'):
         server_port = opt_value
