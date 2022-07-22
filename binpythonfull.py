@@ -43,26 +43,32 @@ def binpython_releases_ver():
 
 def binpython_build_importlibs():
     print(importlibs)
+#get system info(windows or linux ...)
 import platform
 sys = platform.system()
-
+#if system is windows, then enable setwindowtitle() function
 if sys == "Windows":
     def setwindowtitle(titlename):
         import ctypes
         ctypes.windll.kernel32.SetConsoleTitleW(titlename)
+#print binpython all configure function
 def binpythonallconf():
     print("ver: " + ver + " buildversion: " + buildversion + " libs_warning settings:" + libs_warning + " releases full version: " + releases_ver + " custom library that has been build: " + importlibs)
+#if system is windows, show default window title
 if sys == "Windows":
     import ctypes
     ctypes.windll.kernel32.SetConsoleTitleW("BINPython " + ver)
+#binpython self import function
 def self_import(name):
     __import__(name)
 try:
     self_import(importlibs)
+#get libswarning
 except ImportError:
     if libs_warning == "1":
         print("Warning: Custom import library %s does not exist, please check the source code library configuration and rebuild" % importlibs)
         print("")
+#run python files option(-f)
 def optreadfile():
     import sys
     getfile = sys.argv[1]
@@ -181,6 +187,7 @@ except:
 
 
 #def
+#helpinfo base
 helpinfobase = """
 Usage: binpython [OPTIONS]
 
@@ -193,10 +200,12 @@ Options:
 -g            --gui                View GUI About and build info
 -i            --idle               Open BINPython IDLE Code Editor
 """
+#helpinfo plus
 helpinfoplus = """
 -p            --plus               Open BINPython IDE Plus Code Editor(beta) with http web server
 -e            --example            Run various code examples through BINPython
 """
+#base + plus, print full help
 def outputfullhelp():
     try:
         f = open("binpython_config/help.txt",encoding = "utf-8")
@@ -206,20 +215,27 @@ def outputfullhelp():
         if buildversion == "plus":
             print("Additional options for the plus version")
             print(helpinfoplus)
+#set about info
 about = "BINPython " + ver + "-" + releases_ver + " By:XINGYUJIE[https://github.com/xingyujie/binpython] AGPL-3.0 LICENSE Release"
 #getopt
 try:
+#set options
     opts,args = getopt.getopt(sys.argv[1:],'-h-f:-s:-g-i-p-e-v',['help','file=','server=','gui','idle','plus','example','version'])
+#set getopt error prompt
 except getopt.GetoptError as err:
     print("Please check help:")
     print("The parameters you use do not exist or are not entered completely, please check help!!!!")
+#then show full help(outputfullhelp())
     outputfullhelp()
     sys.exit()
+#get every option and run
 for opt_name,opt_value in opts:
     if opt_name in ('-h','--help'):
+#-h show full help function
         outputfullhelp()
         sys.exit()
     if opt_name in ('-v','--version'):
+#-v show version(read custom config)
         try:
             f = open("binpython_config/version.py",encoding = "utf-8")
             exec(f.read())
@@ -229,11 +245,13 @@ for opt_name,opt_value in opts:
             print("Python " + platform.python_version())
         sys.exit()
     if opt_name in ('-f','--file'):
+#-f runfile(or no option)
         file = opt_value
         f = open(file,encoding = "utf-8")
         exec(f.read())
         sys.exit()
     if opt_name in ('-s','--server'):
+#-s set simple http server(support html or files transfer)
         server_port = opt_value
         exec("""
 PORT = """ + server_port + """
@@ -245,6 +263,7 @@ with socketserver.TCPServer(("", PORT), Handler) as httpd:
     httpd.serve_forever()
 """)
     if opt_name in ('-g','--gui'):
+#-g gui show gui about info(based on tkinter)
         from tkinter import *
         root = Tk()
         root.title("Welcome to BINPython")
@@ -264,6 +283,7 @@ with socketserver.TCPServer(("", PORT), Handler) as httpd:
         os.system('cls' if os.name == 'nt' else 'clear')
         print("<<<<<<<<<<START>>>>>>>>>>")
         exec(e1.get(1.0, END))
+#tkinter ide Simulation environment
     if opt_name in ('-i','--idle'):
         import tkinter as tk
         from tkinter import *
@@ -282,6 +302,7 @@ with socketserver.TCPServer(("", PORT), Handler) as httpd:
         tk.Button(master, text="EXIT", width=10, command=master.quit).grid(row=3, column=1, sticky="e", padx=10, pady=5)
         master.mainloop()
         sys.exit()
+#-p binpython ideplus
     if opt_name in ('-p','--plus'):
         import pywebio.input
         from pywebio.input import *
@@ -298,12 +319,14 @@ with socketserver.TCPServer(("", PORT), Handler) as httpd:
 Welcome to BINPython IDEPlus!
 The service starts on port 22948 (http), the program will automatically open the browser, if not, please manually open http://localhost:22948 in the browser
 """)
+#open browser
         webbrowser.open("http://localhost:22940")
         #IDE Plus main
         def line():
             put_text('_______________________',
                 sep=' '
             )
+#set bootstrap ui(bar)
         def head():
             set_env(title="BINPython IDE Plus", auto_scroll_bottom=True)
             put_html("""
@@ -375,6 +398,7 @@ AGPL-V3.0 Release
   </p>
 </div>
 """)
+#index ui
         def index():
             head()
             welcomecard()
@@ -392,6 +416,7 @@ AGPL-V3.0 Release
                 )
             line()
             toast("BINPython IDE Plus is a beta version. May be removed or changed in the future")
+#ideplus
         def ideplus():
             plushead()
             idehead()
@@ -409,6 +434,7 @@ AGPL-V3.0 Release
             f.write(res.encode("utf-8"))
             toast("Successfully saved")
             put_success("The save is successful, and the code is saved to binpython file path" + " \nThe file name is " + '"' + savecodefilename + '"')
+#view code
         def viewcode():
             plushead()
             viewcode_code = pywebio.input.input("Please input file path:")
@@ -417,6 +443,7 @@ AGPL-V3.0 Release
         if __name__ == '__main__':
             start_server([index, ideplus, aboutideplus, viewcode], debug=True, port= 22940)
             pywebio.session.hold()
+#binpython examples
     if opt_name in ('-e','--example'):
         print("Welcome to BINPython example")
         print("""
@@ -431,6 +458,7 @@ List of examples:
 
         """)
         examplenum = input("Please enter the option you want to enter(like 1):")
+#turtle
         if examplenum == "1":
             def exampleturtle():
                 import turtle
@@ -445,6 +473,7 @@ List of examples:
                 turtle.done()
             exampleturtle()
             sys.exit()
+#tkinter
         if examplenum == "2":
             def exampletkinter():
                 import tkinter as tk
@@ -455,6 +484,7 @@ List of examples:
                 app.mainloop()
             exampletkinter()
             sys.exit()
+#tornado
         if examplenum == "3":
             def exampletornado():
                 import asyncio
@@ -476,6 +506,7 @@ List of examples:
             print("Server Started listen on port:8080(http://ip:8080)")
             exampletornado()
             sys.exit()
+#pywebio
         if examplenum == "4":
             import pywebio.input
             from pywebio.input import *
@@ -492,17 +523,20 @@ List of examples:
                     pywebio.session.hold()
             examplepywebio()
             sys.exit()
+#helloworld
         if examplenum == "5":
             setwindowtitle("Hi, Welcome to BINPython")
             name = input("hi...What's your name:")
             print("hi," + name)
             sys.exit()
+#requests
         if examplenum == "6":
             import requests
             def examplerequests():
                 print(requests.get("http://google.com"))
             examplerequests()
             sys.exit()
+#binpython function
         if examplenum == "7":
             print("BINPython() function example")
             import time
@@ -517,12 +551,14 @@ List of examples:
             binpython_shell()
             sys.exit()
 #go main shell
+#custom welcome script
 try:
     f = open("binpython_config/welcome.py",encoding = "utf-8")
     exec(f.read())
     print("Powered by: BINPython[https://github.com/xingyujie/binpython] AGPL 3.0")
 except:
     binpython_welcome_text()
+#debug mode show many info
 try:
     f = open("binpython_debug",encoding = "utf-8")
     print("Debug mode:on")
@@ -545,7 +581,7 @@ try:
     TestPlatform()
 except:
     pass
-
+#binpython custom function plugin 
 #plugin start
 plugin_name = ''
 def binpython_plugin_name(key):
@@ -587,4 +623,5 @@ try:
     exec(startupcode.read())
 except:
     binpython_shell()
+#go shell
 binpython_shell()
