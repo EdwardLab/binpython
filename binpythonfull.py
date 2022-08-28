@@ -10,7 +10,7 @@
 ####################################
 #build configure
 
-ver="0.31-canary-full"
+ver="0.32-build-full"
 
 libs_warning="1"
 #1 is ture 0 is false.
@@ -29,28 +29,30 @@ importlibs="os" #Don't use "import xxx"
 #xxxxxxxxxxxxxx
 ####################################
 #BINPython function and variable START
-def binpython_ver():
-    print(ver)
+class binpythoninfo:
+    def ver():
+        print(ver)
 
-def binpython_buildversion():
-    print(buildversion)
+    def buildversion():
+        print(buildversion)
 
-def binpython_libs_warning():
-    print(libs_warning)
+    def libs_warning():
+        print(libs_warning)
 
-def binpython_releases_ver():
-    print(releases_ver)
+    def releases_ver():
+        print(releases_ver)
 
-def binpython_build_importlibs():
-    print(importlibs)
+    def build_importlibs():
+        print(importlibs)
 #get system info(windows or linux ...)
 import platform
 sys = platform.system()
 #if system is windows, then enable setwindowtitle() function
 if sys == "Windows":
-    def setwindowtitle(titlename):
-        import ctypes
-        ctypes.windll.kernel32.SetConsoleTitleW(titlename)
+    class binpythonwin:
+        def setwindowtitle(titlename):
+            import ctypes
+            ctypes.windll.kernel32.SetConsoleTitleW(titlename)
 #print binpython all configure function
 def binpythonallconf():
     print("ver: " + ver + " buildversion: " + buildversion + " libs_warning settings:" + libs_warning + " releases full version: " + releases_ver + " custom library that has been build: " + importlibs)
@@ -525,7 +527,7 @@ List of examples:
             sys.exit()
 #helloworld
         if examplenum == "5":
-            setwindowtitle("Hi, Welcome to BINPython")
+            binpythonwin.setwindowtitle("Hi, Welcome to BINPython")
             name = input("hi...What's your name:")
             print("hi," + name)
             sys.exit()
@@ -540,11 +542,11 @@ List of examples:
         if examplenum == "7":
             print("BINPython() function example")
             import time
-            binpython_ver()
-            binpython_buildversion()
-            binpython_libs_warning()
-            binpython_build_importlibs()
-            setwindowtitle("Title name(str)")
+            binpythoninfo.ver()
+            binpythoninfo.buildversion()
+            binpythoninfo.libs_warning()
+            binpythoninfo.build_importlibs()
+            binpythonwin.setwindowtitle("Title name(str)")
             binpythonallconf()
             time.sleep(5)
             #main shell
@@ -583,31 +585,32 @@ except:
     pass
 #binpython custom function plugin 
 #plugin start
-plugin_name = ''
-def binpython_plugin_name(key):
-    global plugin_name
-    plugin_name = key
-#print(plugin_name)
-plugin_anthor = ''
-def binpython_plugin_anthor(key):
-    global plugin_anthor
-    plugin_anthor = key
-#description
-plugin_description = ''
-def binpython_plugin_description(key):
-    global plugin_description
-    plugin_description = key
-def binpython_plugin_showinfo():
-    print("BINPython Plugin Info:")
-    print("Plugin Name: " + plugin_name)
-    print("Plugin Anthor: " + plugin_anthor)
-    print("Plugin description: " + plugin_description)
+class binpythonplugin:
+    plugin_name = ''
+    def name(key):
+        global plugin_name
+        plugin_name = key
+    #print(plugin_name)
+    plugin_anthor = ''
+    def anthor(key):
+        global plugin_anthor
+        plugin_anthor = key
+    #description
+    plugin_description = ''
+    def description(key):
+        global plugin_description
+        plugin_description = key
+    def showinfo():
+        print("BINPython Plugin Info:")
+        print("Plugin Name: " + plugin_name)
+        print("Plugin Anthor: " + plugin_anthor)
+        print("Plugin description: " + plugin_description)
 
 
-plugin_loadmain = ''
-def binpython_plugin_loadmain(key):
-    global plugin_loadmain
-    plugin_loadmain = key
+    plugin_loadmain = ''
+    def binpython_plugin_loadmain(key):
+        global plugin_loadmain
+        plugin_loadmain = key
 #binpython_plugin_loadmain("function.py")
 try:
     f = open("binpython_plugin/pluginconfig.binpython",encoding = "utf-8")

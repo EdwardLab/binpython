@@ -38,4 +38,4 @@ exe = EXE(pyz,
           target_arch=None,
           codesign_identity=None,
           entitlements_file=None,
-          icon='C:/Users/xingy/Documents/GitHub/binpython/py.ico')
+          icon='py.ico')
