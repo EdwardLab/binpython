@@ -15,6 +15,9 @@
 ### Discord: https://discord.gg/dz9HwwdSXh
 ### Telegram: @binpython
 ### Twitter: xyj_offical
+## NEW!!! BINPython documentation：https://xingyujie.github.io/binpython-docs/#/
+[Documentation](https://xingyujie.github.io/binpython-docs/#/)
+
 # Why BINPython?
 
 Because:  
