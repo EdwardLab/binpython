@@ -27,7 +27,7 @@ Because:
 * Built-in tkinter and turtle GUI form application framework to quickly build compile-free form applications 
 * Built-in dynamic website running framework such as tornado pywebio, the server is carried with you 
 * Support to encapsulate any library into BINPython, take it with you wherever you go 
-* The program occupies a small storage space, only about 10mb
+* The program occupies a small storage space
 # Usage
 ```
 Usage: binpython [OPTIONS]
