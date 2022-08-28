@@ -1,7 +1,12 @@
-#base info
-print("aaaaa")
-def simpleplugin():
-    print("Hi, BINPython")
-binpython_plugin_name("Example BINPython Plugin")
-binpython_plugin_anthor("BINPython")
-binpython_plugin_description("A simple BINPython plugin Example")
+binpythonplugin.name("BINPython demo plugin")
+binpythonplugin.anthor("Edward")
+binpythonplugin.description("Simple BINPython example")
+
+import os
+class binpython_demo():
+    def hello():
+        print("hello BINPython")
+    def linuxuname():
+        os.system("uname -a")
+    def winver():
+        os.system("winver")

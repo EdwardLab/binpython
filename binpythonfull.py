@@ -605,10 +605,8 @@ class binpythonplugin:
         print("Plugin Name: " + plugin_name)
         print("Plugin Anthor: " + plugin_anthor)
         print("Plugin description: " + plugin_description)
-
-
     plugin_loadmain = ''
-    def binpython_plugin_loadmain(key):
+    def loadmain(key):
         global plugin_loadmain
         plugin_loadmain = key
 #binpython_plugin_loadmain("function.py")

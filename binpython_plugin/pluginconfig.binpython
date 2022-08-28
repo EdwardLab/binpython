@@ -1,1 +1,1 @@
-binpython_plugin_loadmain("function.py")
+binpythonplugin.loadmain("function.py")
