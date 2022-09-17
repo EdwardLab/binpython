@@ -10,17 +10,17 @@
 ####################################
 #build configure
 
-ver="0.32-build-full"
+ver = "0.34-build-full"
 
-libs_warning="1"
+libs_warning = "1"
 #1 is ture 0 is false.
 #Changing the value to 0 will close the prompt that the library does not exist
 
 buildversion = "plus" #plus version and standard version
 
-releases_ver="offical" + buildversion + "-building"
-
-importlibs="os" #Don't use "import xxx" 
+releases_ver = "offical" + buildversion + "-building"
+importlibs = "os" #Don't use "import xxx" 
+cloudrunver = "1.01"
 #Imported library name, please use "importlibs="<library name>" instead of "import <library name>"
 #Please note: The "importlibs" function does not support loading functions (such as from xxxx import xxxx, if necessary, please write it in the following location. However, please note that this operation may have the risk of error reporting, please report issues or solve it yourself
 #xxxxxxxxxxxxxx
@@ -78,6 +78,41 @@ def optreadfile():
     exec(getfilecode.read())
     input("Run finished. Enter to Shell.")
     sys.exit(0)
+class cloudrun:
+    def get(pkgname):
+        try:
+            cloudrunenv = True
+            getcoderes = urllib.request.urlopen(f"https://raw.githubusercontent.com/xingyujie/cloudrun-repository/main/{pkgname}.py")
+        except(Exception, BaseException) as error:
+            print("There is no network connection or the repository does not exist for this script")
+            print("Error details are in cloudrun_error.log in the run directory")
+            f = open("cloudrun_error.log", "a")
+            f.write(str(error))
+        try:
+            exec(str(getcoderes.read().decode('utf-8')))
+            getcoderes.close()
+        except(Exception, BaseException) as error:
+            print("run failed")
+            print("Error details are in cloudrun_error.log in the run directory")
+            f = open("cloudrun_error.log", "a")
+            f.write(str(error))
+    def load(url):
+        try:
+            cloudrunenv = True
+            getcoderes = urllib.request.urlopen(url)
+        except(Exception, BaseException) as error:
+            print("There is no network connection or the repository does not exist for this script")
+            print("Error details are in cloudrun_error.log in the run directory")
+            f = open("cloudrun_error.log", "a")
+            f.write(str(error))
+        try:
+            exec(getcoderes.read().decode('utf-8'))
+            getcoderes.close()
+        except(Exception, BaseException) as error:
+            print("run failed")
+            print("Error details are in cloudrun_error.log in the run directory")
+            f = open("cloudrun_error.log", "a")
+            f.write(str(error))
 try:
 #base import
     import getopt
@@ -86,6 +121,9 @@ try:
     import os
     import timeit
     import pdb
+    import random
+    import webbrowser
+    import urllib.request
 #fix for exit()
     from sys import exit
 #import for http_server
@@ -204,8 +242,9 @@ Options:
 """
 #helpinfo plus
 helpinfoplus = """
--p            --plus               Open BINPython IDE Plus Code Editor(beta) with http web server
+-p <port>     --plus=<port>        Open BINPython IDE Plus Code Editor(beta) with http web server
 -e            --example            Run various code examples through BINPython
+-c            --cloudrun           Run Python scripts in the cloud via CloudRun (into CloudRun CLI)
 """
 #base + plus, print full help
 def outputfullhelp():
@@ -222,7 +261,7 @@ about = "BINPython " + ver + "-" + releases_ver + " By:XINGYUJIE[https://github.
 #getopt
 try:
 #set options
-    opts,args = getopt.getopt(sys.argv[1:],'-h-f:-s:-g-i-p-e-v',['help','file=','server=','gui','idle','plus','example','version'])
+    opts,args = getopt.getopt(sys.argv[1:],'-h-f:-s:-g-i-p:-e-c-v',['help','file=','server=','gui','idle','plus','example','cloudrun','version'])
 #set getopt error prompt
 except getopt.GetoptError as err:
     print("Please check help:")
@@ -255,6 +294,7 @@ for opt_name,opt_value in opts:
     if opt_name in ('-s','--server'):
 #-s set simple http server(support html or files transfer)
         server_port = opt_value
+        webbrowser.open(f"http://127.0.0.1:{server_port}")
         exec("""
 PORT = """ + server_port + """
 
@@ -306,6 +346,7 @@ with socketserver.TCPServer(("", PORT), Handler) as httpd:
         sys.exit()
 #-p binpython ideplus
     if opt_name in ('-p','--plus'):
+        ideplusport = opt_value
         import pywebio.input
         from pywebio.input import *
         from pywebio.output import *
@@ -317,12 +358,12 @@ with socketserver.TCPServer(("", PORT), Handler) as httpd:
         import webbrowser
         print("______________________________________")
         print("BINPython WEB IDE STARTED")
-        print("""
+        print(f"""
 Welcome to BINPython IDEPlus!
-The service starts on port 22948 (http), the program will automatically open the browser, if not, please manually open http://localhost:22948 in the browser
+HTTP Port: {ideplusport}
 """)
 #open browser
-        webbrowser.open("http://localhost:22940")
+        webbrowser.open(f"http://127.0.0.1:{ideplusport}")
         #IDE Plus main
         def line():
             put_text('_______________________',
@@ -331,9 +372,9 @@ The service starts on port 22948 (http), the program will automatically open the
 #set bootstrap ui(bar)
         def head():
             set_env(title="BINPython IDE Plus", auto_scroll_bottom=True)
-            put_html("""
+            put_html(f"""
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
-  <a class="navbar-brand" href="http://localhost:22940"></a>
+  <a class="navbar-brand" href="http://localhost:{ideplusport}"></a>
     <img src="https://github.com/xingyujie/binpython/blob/main/py.ico?raw=true" width="30" height="30" class="d-inline-block align-top" alt="">
     BINPython IDEPlus
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -342,10 +383,10 @@ The service starts on port 22948 (http), the program will automatically open the
   <div class="collapse navbar-collapse" id="navbarSupportedContent">
     <ul class="navbar-nav mr-auto">
       <li class="nav-item">
-        <a class="nav-link active" aria-current="page" href="http://localhost:22940/">Home</a>
+        <a class="nav-link active" aria-current="page" href="http://localhost:{ideplusport}/">Home</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="http://localhost:22940/?app=ideplus">IDEPlus</a>
+        <a class="nav-link" href="http://localhost:{ideplusport}/?app=ideplus">IDEPlus</a>
       </li>
         </a>
     </ul>
@@ -355,9 +396,9 @@ The service starts on port 22948 (http), the program will automatically open the
 """)
         def plushead():
             set_env(title="BINPython IDE Plus", auto_scroll_bottom=True)
-            put_html("""
+            put_html(f"""
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
-  <a class="navbar-brand" href="http://localhost:22940"></a>
+  <a class="navbar-brand" href="http://localhost:{ideplusport}"></a>
     <img src="https://github.com/xingyujie/binpython/blob/main/py.ico?raw=true" width="30" height="30" class="d-inline-block align-top" alt="">
     BINPython IDEPlus
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -366,10 +407,10 @@ The service starts on port 22948 (http), the program will automatically open the
   <div class="collapse navbar-collapse" id="navbarSupportedContent">
     <ul class="navbar-nav mr-auto">
       <li class="nav-item">
-        <a class="nav-link" href="http://localhost:22940/">Home</a>
+        <a class="nav-link" href="http://localhost:{ideplusport}/">Home</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link active" aria-current="page" href="http://localhost:22940/?app=ideplus">IDEPlus</a>
+        <a class="nav-link active" aria-current="page" href="http://localhost:{ideplusport}/?app=ideplus">IDEPlus</a>
       </li>
         </a>
     </ul>
@@ -389,14 +430,14 @@ AGPL-V3.0 Release
 
 """)
         def welcomecard():
-            put_html("""
+            put_html(f"""
   <div class="jumbotron">
   <h1 class="display-3">Welcome to BINPython!</h1>
   <p class="lead">This is a portable IDE environment for BINPython</p>
   <hr class="my-4">
   <p>Fast and portable, runs via BINPython</p>
   <p class="lead">
-    <a class="btn btn-primary btn-lg" href="http://localhost:22940/?app=ideplus" role="button">Try IDE Plus!</a>
+    <a class="btn btn-primary btn-lg" href="http://localhost:{ideplusport}/?app=ideplus" role="button">Try IDE Plus!</a>
   </p>
 </div>
 """)
@@ -405,11 +446,11 @@ AGPL-V3.0 Release
             head()
             welcomecard()
             put_markdown("## Features")
-            put_link("IDEPlus", url='http://localhost:22940/?app=ideplus')
+            put_link("IDEPlus", url=f'http://localhost:{ideplusport}/?app=ideplus')
             line()
-            put_link("About BINPython", url='http://localhost:22940/?app=aboutideplus')
+            put_link("About BINPython", url=f'http://localhost:{ideplusport}/?app=aboutideplus')
             line()
-            put_link("View Code", url='http://localhost:22940/?app=viewcode')
+            put_link("View Code", url=f'http://localhost:{ideplusport}/?app=viewcode')
         def idehead():
             set_env(title="BINPython IDE Plus", auto_scroll_bottom=True)
             put_html("<h1>BINPython IDE Plus</h1>")
@@ -443,8 +484,9 @@ AGPL-V3.0 Release
             f = open(viewcode_code,encoding = "utf-8")
             put_code(f.read(), language='python')
         if __name__ == '__main__':
-            start_server([index, ideplus, aboutideplus, viewcode], debug=True, port= 22940)
+            start_server([index, ideplus, aboutideplus, viewcode], debug=True, port=ideplusport)
             pywebio.session.hold()
+            config(title="BINPython") #pywebio global title
 #binpython examples
     if opt_name in ('-e','--example'):
         print("Welcome to BINPython example")
@@ -552,6 +594,39 @@ List of examples:
             #main shell
             binpython_shell()
             sys.exit()
+
+    if opt_name in ('-c','--cloudrun'):
+        
+        print("Welcome to CloudRun CLI. Let your script run in the cloud with BINPython")
+        print('Type "help" for help information')
+        while True:
+            cloudruncli = input("cloudrun~ ")
+            if cloudruncli == 'help':
+                print("""
+CloudRun Help:
+get -- Enter application/script name to get run from software repository
+load -- Run scripts from custom URL
+version -- CloudRun Version
+help -- run this help             
+                """)
+            if cloudruncli == 'get':
+                print("Get apps/scripts in software repository")
+                print("Under normal circumstances, we review the code of the software repositories and generally do not have any malware. But we will not take any legal responsibility")
+                print()
+                pkgname = input("packagename: ")
+                cloudrun.get(pkgname)
+            if cloudruncli == 'load':
+                print("Let CloudRun run scripts through a custom server")
+                print("The format should be like this: http://domain.com/filename.py")
+                url = input("Python script URL: ")
+                cloudrun.load(url)
+            if cloudruncli == 'version':
+                print(f"CloudRun-{cloudrunver} BINPython version By:Edward Hsing(xingyujie) AGPL-3.0 LICENSE")
+            if cloudruncli == '':
+                pass
+            else:
+                pass
+            
 #go main shell
 #custom welcome script
 try:
@@ -609,6 +684,7 @@ class binpythonplugin:
     def loadmain(key):
         global plugin_loadmain
         plugin_loadmain = key
+
 #binpython_plugin_loadmain("function.py")
 try:
     f = open("binpython_plugin/pluginconfig.binpython",encoding = "utf-8")
@@ -623,6 +699,6 @@ try:
     startupcode = open(filename.read(),encoding = "utf-8")
     exec(startupcode.read())
 except:
-    binpython_shell()
+    pass
 #go shell
 binpython_shell()
