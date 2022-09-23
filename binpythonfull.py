@@ -10,7 +10,7 @@
 ####################################
 #build configure
 
-ver = "0.34-build-full"
+ver = "0.36-build-full"
 
 libs_warning = "1"
 #1 is ture 0 is false.
@@ -19,8 +19,8 @@ libs_warning = "1"
 buildversion = "plus" #plus version and standard version
 
 releases_ver = "offical" + buildversion + "-building"
-importlibs = "os" #Don't use "import xxx" 
-cloudrunver = "1.01"
+importlibs = "os"
+cloudrunver = "1.03"
 #Imported library name, please use "importlibs="<library name>" instead of "import <library name>"
 #Please note: The "importlibs" function does not support loading functions (such as from xxxx import xxxx, if necessary, please write it in the following location. However, please note that this operation may have the risk of error reporting, please report issues or solve it yourself
 #xxxxxxxxxxxxxx
@@ -44,6 +44,7 @@ class binpythoninfo:
 
     def build_importlibs():
         print(importlibs)
+import time
 #get system info(windows or linux ...)
 import platform
 sys = platform.system()
@@ -81,13 +82,18 @@ def optreadfile():
 class cloudrun:
     def get(pkgname):
         try:
+            sources = open("cloudrun_config/sources.config", "r")
+            sources = str(sources.read()) + pkgname + ".py"
+        except:
+            sources = f"https://raw.githubusercontent.com/xingyujie/cloudrun-repository/main/{pkgname}.py"
+        try:
             cloudrunenv = True
-            getcoderes = urllib.request.urlopen(f"https://raw.githubusercontent.com/xingyujie/cloudrun-repository/main/{pkgname}.py")
+            getcoderes = urllib.request.urlopen(sources)
         except(Exception, BaseException) as error:
             print("There is no network connection or the repository does not exist for this script")
             print("Error details are in cloudrun_error.log in the run directory")
             f = open("cloudrun_error.log", "a")
-            f.write(str(error))
+            f.write('Get Error: ' + time.strftime('%m-%d-%Y %H:%M:%S',time.localtime(time.time())) + ' ' + str(error) + '\n')
         try:
             exec(str(getcoderes.read().decode('utf-8')))
             getcoderes.close()
@@ -95,7 +101,7 @@ class cloudrun:
             print("run failed")
             print("Error details are in cloudrun_error.log in the run directory")
             f = open("cloudrun_error.log", "a")
-            f.write(str(error))
+            f.write('Run Error: ' + time.strftime('%m-%d-%Y %H:%M:%S',time.localtime(time.time())) + ' ' + str(error) + '\n')
     def load(url):
         try:
             cloudrunenv = True
@@ -104,7 +110,7 @@ class cloudrun:
             print("There is no network connection or the repository does not exist for this script")
             print("Error details are in cloudrun_error.log in the run directory")
             f = open("cloudrun_error.log", "a")
-            f.write(str(error))
+            f.write('Get Error: ' + time.strftime('%m-%d-%Y %H:%M:%S',time.localtime(time.time())) + ' ' + str(error) + '\n')
         try:
             exec(getcoderes.read().decode('utf-8'))
             getcoderes.close()
@@ -112,7 +118,14 @@ class cloudrun:
             print("run failed")
             print("Error details are in cloudrun_error.log in the run directory")
             f = open("cloudrun_error.log", "a")
-            f.write(str(error))
+            f.write('Run Error: ' + time.strftime('%m-%d-%Y %H:%M:%S',time.localtime(time.time())) + ' ' + str(error) + '\n')
+    def editsource(url):
+        try:
+            os.mkdir("cloudrun_config")
+        except:
+            pass
+        sources = open("cloudrun_config/sources.config", "w")
+        sources.write(url)
 try:
 #base import
     import getopt
@@ -176,7 +189,7 @@ except ImportError:
         print("")
 #main BINPython
 def binpython_welcome_text():
-    print("BINPython " + ver + "-" + releases_ver + " (Python Version:" + platform.python_version() + ")By:XINGYUJIE https://github.com/xingyujie/binpython[Running on " + platform.platform() + " " + platform.version() + "]")
+    print("BINPython " + ver + "-" + releases_ver + " (Python Version:" + platform.python_version() + ") By: Edward Hsing(Xing Yu Jie) https://github.com/xingyujie/binpython[Running on " + platform.platform() + " " + platform.version() + "]")
     print('Type "about", "help", "copyright", "credits" or "license" for more information.')
 def binpython_shell():
     while True:
@@ -186,7 +199,7 @@ def binpython_shell():
                 print(globals()[pycmd])
                 continue
             elif pycmd == 'about':
-                print("BINPython By:XINGYUJIE[https://github.com/xingyujie] AGPL-3.0 LICENSE Release")
+                print("BINPython By: Edward Hsing(Xing Yu Jie)[https://github.com/xingyujie] AGPL-3.0 LICENSE Release")
             elif pycmd == 'help':
                 print("Type help() for interactive help, or help(object) for help about object.")
             elif pycmd == 'copyright':
@@ -257,7 +270,7 @@ def outputfullhelp():
             print("Additional options for the plus version")
             print(helpinfoplus)
 #set about info
-about = "BINPython " + ver + "-" + releases_ver + " By:XINGYUJIE[https://github.com/xingyujie/binpython] AGPL-3.0 LICENSE Release"
+about = "BINPython " + ver + "-" + releases_ver + " By: Edward Hsing(Xing Yu Jie)[https://github.com/xingyujie/binpython] AGPL-3.0 LICENSE Release"
 #getopt
 try:
 #set options
@@ -282,7 +295,7 @@ for opt_name,opt_value in opts:
             exec(f.read())
             print("Powered by: BINPython[https://github.com/xingyujie/binpython] AGPL 3.0")
         except:
-            print("BINPython " + ver + "-" + releases_ver + " By:XINGYUJIE[https://github.com/xingyujie/binpython] AGPL-3.0 LICENSE Release")
+            print("BINPython " + ver + "-" + releases_ver + " By: Edward Hsing(Xing Yu Jie)[https://github.com/xingyujie/binpython] AGPL-3.0 LICENSE Release")
             print("Python " + platform.python_version())
         sys.exit()
     if opt_name in ('-f','--file'):
@@ -606,22 +619,37 @@ List of examples:
 CloudRun Help:
 get -- Enter application/script name to get run from software repository
 load -- Run scripts from custom URL
+editsource -- Set up custom sources and save via configuration files
+shell -- Go to BINPython Shell
 version -- CloudRun Version
-help -- run this help             
+help -- show this help             
                 """)
             if cloudruncli == 'get':
                 print("Get apps/scripts in software repository")
                 print("Under normal circumstances, we review the code of the software repositories and generally do not have any malware. But we will not take any legal responsibility")
                 print()
                 pkgname = input("packagename: ")
-                cloudrun.get(pkgname)
+                if pkgname == '':
+                    pass
+                else:
+                    cloudrun.get(pkgname)
             if cloudruncli == 'load':
                 print("Let CloudRun run scripts through a custom server")
                 print("The format should be like this: http://domain.com/filename.py")
                 url = input("Python script URL: ")
-                cloudrun.load(url)
+                if url == '':
+                    pass
+                else:
+                    cloudrun.load(url)
+            if cloudruncli == 'editsource':
+                print('caution! The set software source must be in a standard format, otherwise it may not work, like http://127.0.0.1/, if you set http://127.0.0.1, it will not work properly, even if there is one less "/"!')
+                entersource = input("Please input sources server address: ")
+                cloudrun.editsource(entersource)
+                print("success!")
+            if cloudruncli == 'shell':
+                binpython_shell()
             if cloudruncli == 'version':
-                print(f"CloudRun-{cloudrunver} BINPython version By:Edward Hsing(xingyujie) AGPL-3.0 LICENSE")
+                print(f"CloudRun-{cloudrunver} BINPython version By:Edward Hsing(Xing Yu Jie) AGPL-3.0 LICENSE")
             if cloudruncli == '':
                 pass
             else:
