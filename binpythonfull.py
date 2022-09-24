@@ -10,15 +10,14 @@
 ####################################
 #build configure
 
-ver = "0.36-build-full"
+ver = "0.40-build-full"
 
 libs_warning = "1"
 #1 is ture 0 is false.
 #Changing the value to 0 will close the prompt that the library does not exist
 
-buildversion = "plus" #plus version and standard version
 
-releases_ver = "offical" + buildversion + "-building"
+releases_ver = "offical"
 importlibs = "os"
 cloudrunver = "1.03"
 #Imported library name, please use "importlibs="<library name>" instead of "import <library name>"
@@ -29,12 +28,10 @@ cloudrunver = "1.03"
 #xxxxxxxxxxxxxx
 ####################################
 #BINPython function and variable START
+
 class binpythoninfo:
     def ver():
         print(ver)
-
-    def buildversion():
-        print(buildversion)
 
     def libs_warning():
         print(libs_warning)
@@ -44,9 +41,12 @@ class binpythoninfo:
 
     def build_importlibs():
         print(importlibs)
+from email.policy import default
+from os import makedirs
 import time
 #get system info(windows or linux ...)
 import platform
+from xmlrpc.server import CGIXMLRPCRequestHandler
 sys = platform.system()
 #if system is windows, then enable setwindowtitle() function
 if sys == "Windows":
@@ -56,7 +56,7 @@ if sys == "Windows":
             ctypes.windll.kernel32.SetConsoleTitleW(titlename)
 #print binpython all configure function
 def binpythonallconf():
-    print("ver: " + ver + " buildversion: " + buildversion + " libs_warning settings:" + libs_warning + " releases full version: " + releases_ver + " custom library that has been build: " + importlibs)
+    print("ver: " + ver + " buildversion: " + " libs_warning settings:" + libs_warning + " releases full version: " + releases_ver + " custom library that has been build: " + importlibs)
 #if system is windows, show default window title
 if sys == "Windows":
     import ctypes
@@ -79,53 +79,6 @@ def optreadfile():
     exec(getfilecode.read())
     input("Run finished. Enter to Shell.")
     sys.exit(0)
-class cloudrun:
-    def get(pkgname):
-        try:
-            sources = open("cloudrun_config/sources.config", "r")
-            sources = str(sources.read()) + pkgname + ".py"
-        except:
-            sources = f"https://raw.githubusercontent.com/xingyujie/cloudrun-repository/main/{pkgname}.py"
-        try:
-            cloudrunenv = True
-            getcoderes = urllib.request.urlopen(sources)
-        except(Exception, BaseException) as error:
-            print("There is no network connection or the repository does not exist for this script")
-            print("Error details are in cloudrun_error.log in the run directory")
-            f = open("cloudrun_error.log", "a")
-            f.write('Get Error: ' + time.strftime('%m-%d-%Y %H:%M:%S',time.localtime(time.time())) + ' ' + str(error) + '\n')
-        try:
-            exec(str(getcoderes.read().decode('utf-8')))
-            getcoderes.close()
-        except(Exception, BaseException) as error:
-            print("run failed")
-            print("Error details are in cloudrun_error.log in the run directory")
-            f = open("cloudrun_error.log", "a")
-            f.write('Run Error: ' + time.strftime('%m-%d-%Y %H:%M:%S',time.localtime(time.time())) + ' ' + str(error) + '\n')
-    def load(url):
-        try:
-            cloudrunenv = True
-            getcoderes = urllib.request.urlopen(url)
-        except(Exception, BaseException) as error:
-            print("There is no network connection or the repository does not exist for this script")
-            print("Error details are in cloudrun_error.log in the run directory")
-            f = open("cloudrun_error.log", "a")
-            f.write('Get Error: ' + time.strftime('%m-%d-%Y %H:%M:%S',time.localtime(time.time())) + ' ' + str(error) + '\n')
-        try:
-            exec(getcoderes.read().decode('utf-8'))
-            getcoderes.close()
-        except(Exception, BaseException) as error:
-            print("run failed")
-            print("Error details are in cloudrun_error.log in the run directory")
-            f = open("cloudrun_error.log", "a")
-            f.write('Run Error: ' + time.strftime('%m-%d-%Y %H:%M:%S',time.localtime(time.time())) + ' ' + str(error) + '\n')
-    def editsource(url):
-        try:
-            os.mkdir("cloudrun_config")
-        except:
-            pass
-        sources = open("cloudrun_config/sources.config", "w")
-        sources.write(url)
 try:
 #base import
     import getopt
@@ -137,6 +90,8 @@ try:
     import random
     import webbrowser
     import urllib.request
+    import base64
+    import cmd
 #fix for exit()
     from sys import exit
 #import for http_server
@@ -235,13 +190,232 @@ try:
 except:
     pass
 
+def cloudruncli():
+           
+        print("Welcome to CloudRun CLI. Let your script run in the cloud with BINPython")
+        print('Type "help" for more information')
+        while True:
+            cloudruncli = input("cloudrun~ ")
+            if cloudruncli == 'help':
+                print("""
+CloudRun Help:
+get -- Enter application/script name to get run from software repository
+load -- Run scripts from custom URL
+editsource -- Set up custom sources and save via configuration files
+shell -- Go to BINPython Shell
+version -- CloudRun Version
+help -- show this help             
+                """)
+            if cloudruncli == 'get':
+                print("Get apps/scripts in software repository")
+                print("Under normal circumstances, we review the code of the software repositories and generally do not have any malware. But we will not take any legal responsibility")
+                print()
+                pkgname = input("packagename: ")
+                if pkgname == '':
+                    pass
+                else:
+                    cloudrun.get(pkgname)
+            if cloudruncli == 'load':
+                print("Let CloudRun run scripts through a custom server")
+                print("The format should be like this: http://domain.com/filename.py")
+                url = input("Python script URL: ")
+                if url == '':
+                    pass
+                else:
+                    cloudrun.load(url)
+            if cloudruncli == 'editsource':
+                print('caution! The set software source must be in a standard format, otherwise it may not work, like http://127.0.0.1/, if you set http://127.0.0.1, it will not work properly, even if there is one less "/"!')
+                entersource = input("Please input sources server address: ")
+                cloudrun.editsource(entersource)
+                print("success!")
+            if cloudruncli == 'shell':
+                binpython_shell()
+            if cloudruncli == 'version':
+                print(f"CloudRun-{cloudrunver} BINPython version By:Edward Hsing(Xing Yu Jie) AGPL-3.0 LICENSE")
+            if cloudruncli == '':
+                pass
+            else:
+                pass
+            
+#cloudrun functions start
+from pywebio.output import *
+import pywebio.input
+class cloudrun:
+    def get(pkgname):
+        try:
+            sources = open("cloudrun_config/sources.config", "r")
+            sources = str(sources.read()) + pkgname + ".py"
+        except:
+            sources = f"https://raw.githubusercontent.com/xingyujie/cloudrun-repository/main/{pkgname}.py"
+        try:
+            cloudrunenv = True
+            getcoderes = urllib.request.urlopen(sources)
+        except(Exception, BaseException) as error:
+            print("There is no network connection or the repository does not exist for this script")
+            print("Error details are in cloudrun_error.log in the run directory")
+            f = open("cloudrun_error.log", "a")
+            f.write('Get Error: ' + time.strftime('%m-%d-%Y %H:%M:%S',time.localtime(time.time())) + ' ' + str(error) + '\n')
+        try:
+            exec(str(getcoderes.read().decode('utf-8')))
+            getcoderes.close()
+        except(Exception, BaseException) as error:
+            print("run failed")
+            print("Error details are in cloudrun_error.log in the run directory")
+            f = open("cloudrun_error.log", "a")
+            f.write('Run Error: ' + time.strftime('%m-%d-%Y %H:%M:%S',time.localtime(time.time())) + ' ' + str(error) + '\n')
+    def load(url):
+        try:
+            cloudrunenv = True
+            getcoderes = urllib.request.urlopen(url)
+        except(Exception, BaseException) as error:
+            print("There is no network connection or the repository does not exist for this script")
+            print("Error details are in cloudrun_error.log in the run directory")
+            f = open("cloudrun_error.log", "a")
+            f.write('Get Error: ' + time.strftime('%m-%d-%Y %H:%M:%S',time.localtime(time.time())) + ' ' + str(error) + '\n')
+        try:
+            exec(getcoderes.read().decode('utf-8'))
+            getcoderes.close()
+        except(Exception, BaseException) as error:
+            print("run failed")
+            print("Error details are in cloudrun_error.log in the run directory")
+            f = open("cloudrun_error.log", "a")
+            f.write('Run Error: ' + time.strftime('%m-%d-%Y %H:%M:%S',time.localtime(time.time())) + ' ' + str(error) + '\n')
+    def editsource(url):
+        try:
+            os.mkdir("cloudrun_config")
+        except:
+            pass
+        sources = open("cloudrun_config/sources.config", "w")
+        sources.write(url)
+    
+#cloudrun functions end
+
+#cmd start
+def listfiles():
+    import os
+    dirs = os.listdir("./")
+    for file in dirs:
+        print (file)
+
+def binpython_cmd():
+    try:
+        global cmd_username
+        defaultprofile = open("binpython_filesystem/userdata/defaultloginuser", "r")
+        cmd_username = defaultprofile.read()
+        os.chdir(f"binpython_filesystem/userdata/home/{cmd_username}")
+    except:
+        cmd_username = 'user'
+        print('Unable to switch to BINPython userprofile: Default user not found. To use a temporary directory user, use "adddefaultuser" to create a default user')
+    try:
+        scriptpath = os.path.dirname(os.path.realpath(sys.argv[0]))
+        gethostname = open(scriptpath + "/binpython_filesystem/hostname/hostname", "r")
+        cmd_hostname = gethostname.read()
+    except:
+        cmd_hostname = "binpython"
+    class cmdshell(cmd.Cmd):
+        intro = 'Welcome to BINPython Shell. Type help or ? to list commands and help.\n'
+        prompt = cmd_username + '@' + cmd_hostname + ':' + '# '
+        file = None
+        def do_cloudrunget(self, arg):
+            'Get CloudRun Script from repository use:cloudrunget <scriptname>'
+            cloudrun.get(arg)        
+        def do_cloudrunload(self, arg):
+            'Get CloudRun Script from repository use:cloudrunload <URL> URL can be http://domain.com/filename.py'
+            cloudrun.load(arg)
+        def do_cloudruneditsource(self, arg):
+            'Change the source of CloudRun'
+            cloudrun.editsource(arg)
+        def do_ls(self, arg):
+            'List files'
+            listfiles()
+        def do_pwd(self, arg):
+            'show current path'
+            print(os.path.dirname(os.path.realpath('__file__')))
+        def do_cd(self, arg):
+            'change path'
+            os.chdir(arg)
+        def do_adduser(self, arg):
+            'Create a new user profile for BINPython'
+            print("Create a new user profile for BINPython")
+            scriptpath = os.path.dirname(os.path.realpath(sys.argv[0]))
+            username = input("Username: ")
+            print("create user...")
+            try:
+                os.makedirs(f"binpython_filesystem/userdata/home/{username}")
+            except(Exception, BaseException) as error:
+                print("User already exits or system error")
+                print(error)
+            print("Done")
+        def do_adddefaultuser(self, arg):
+            'Create a default user'
+            global scriptpath
+            scriptpath = os.path.dirname(os.path.realpath(sys.argv[0]))
+            print("Create a default login user for BINPython")
+            username = input("Default Username: ")
+            print("create user...")
+            try:
+                os.makedirs(scriptpath + f"/binpython_filesystem/userdata/home/{username}")
+            except:
+                pass
+            defaultprofile = open(scriptpath + "/binpython_filesystem/userdata/defaultloginuser", "w")
+            defaultprofile.write(username)
+            print("Done")
+        def do_shell(self, arg):
+            'Go to Python interpreter'
+            binpython_shell()
+        def do_python(self, arg):
+            'Run a Python script file (*.py) Usage: python <filename>.py'
+            f = open(arg, "r")
+            exec(f.read())
+        def do_seteditor(self, arg):
+            'Set a default Python or Text file code editor usage: seteditor <editorname>. like: "seteditor code" (Open code via Visual Studio Code when using the "edit <filename>" command). "seteditor notepad" (Open the code through Notepad that comes with Windows)'
+            scriptpath = os.path.dirname(os.path.realpath(sys.argv[0]))
+            defaulteditor = open("defaulteditor.config", "w")
+            defaulteditor.write(arg)
+        def do_edit(self, arg):
+            'Before using this command, you must use "seteditor <editorname>" to set the editor (see the usage of this parameter for details), otherwise it cannot be called up. edit usage: edit <filename>'
+            scriptpath = os.path.dirname(os.path.realpath(sys.argv[0]))
+            defaulteditor = open("defaulteditor.config", "r")
+            os.system(defaulteditor.read() + ' ' + arg)
+        def do_exit(self, arg):
+            'exit shell'
+            sys.exit()
+        def do_sethostname(self, arg):
+            'set up hostname. Usage sethostname <hostname>'
+            scriptpath = os.path.dirname(os.path.realpath(sys.argv[0]))
+            try:
+                os.makedirs(scriptpath + "/binpython_filesystem/hostname/")
+            except:
+                pass
+            hostnamefile = open(scriptpath + "/binpython_filesystem/hostname/hostname", "w")
+            hostnamefile.write(arg)
+        def do_rm(self, arg):
+            'remove files Usage: rm <filename>'
+            os.remove(arg)
+        def do_system(self, arg):
+            'call system command. Usage: system <command> like: system ls (Invoke system command to list directory)'
+            os.system(arg)
+        def do_mkdir(self, arg):
+            'make a directory. Usage: mkdir <dirname>'
+            os.mkdir(arg)
+        def do_touch(self, arg):
+            'make a empty file Usage: touch <filename>'
+            open(arg, "w")
+        def do_write(self, arg):
+            'write text to file. Usage: write <filename>'
+            writetext = open(arg, "w")
+            arg1 = input(f"What you want to write to the target file {arg}: ")
+            writetext.write(arg1)
+            
 
 
-
+    if __name__ == '__main__':
+        cmdshell().cmdloop()
+#cmd end
 
 #def
-#helpinfo base
-helpinfobase = """
+#print all helpinfo
+helpinfo = """
 Usage: binpython [OPTIONS]
 
 Options:
@@ -249,15 +423,13 @@ Options:
 -f            --file               Enter Python Filename and run (*.py), But this options is no Run finished prompt
 -h            --help               View this help
 -s <port>     --server=<port>      Start a simple web server that supports html and file transfer (http.server)
--v            --version            View BINPython Version
 -g            --gui                View GUI About and build info
 -i            --idle               Open BINPython IDLE Code Editor
-"""
-#helpinfo plus
-helpinfoplus = """
 -p <port>     --plus=<port>        Open BINPython IDE Plus Code Editor(beta) with http web server
 -e            --example            Run various code examples through BINPython
 -c            --cloudrun           Run Python scripts in the cloud via CloudRun (into CloudRun CLI)
+-C            --cmd                Operations on BINPython (including Package Manager, CloudRun, etc.)
+-v            --version            View BINPython Version
 """
 #base + plus, print full help
 def outputfullhelp():
@@ -265,16 +437,13 @@ def outputfullhelp():
         f = open("binpython_config/help.txt",encoding = "utf-8")
         print(f.read())
     except:
-        print(helpinfobase)
-        if buildversion == "plus":
-            print("Additional options for the plus version")
-            print(helpinfoplus)
+        print(helpinfo)
 #set about info
 about = "BINPython " + ver + "-" + releases_ver + " By: Edward Hsing(Xing Yu Jie)[https://github.com/xingyujie/binpython] AGPL-3.0 LICENSE Release"
 #getopt
 try:
 #set options
-    opts,args = getopt.getopt(sys.argv[1:],'-h-f:-s:-g-i-p:-e-c-v',['help','file=','server=','gui','idle','plus','example','cloudrun','version'])
+    opts,args = getopt.getopt(sys.argv[1:],'-h-f:-s:-g-i-p:-e-c-C-v',['help','file=','server=','gui','idle','plus','example','cloudrun','cmd','version'])
 #set getopt error prompt
 except getopt.GetoptError as err:
     print("Please check help:")
@@ -609,52 +778,9 @@ List of examples:
             sys.exit()
 
     if opt_name in ('-c','--cloudrun'):
-        
-        print("Welcome to CloudRun CLI. Let your script run in the cloud with BINPython")
-        print('Type "help" for help information')
-        while True:
-            cloudruncli = input("cloudrun~ ")
-            if cloudruncli == 'help':
-                print("""
-CloudRun Help:
-get -- Enter application/script name to get run from software repository
-load -- Run scripts from custom URL
-editsource -- Set up custom sources and save via configuration files
-shell -- Go to BINPython Shell
-version -- CloudRun Version
-help -- show this help             
-                """)
-            if cloudruncli == 'get':
-                print("Get apps/scripts in software repository")
-                print("Under normal circumstances, we review the code of the software repositories and generally do not have any malware. But we will not take any legal responsibility")
-                print()
-                pkgname = input("packagename: ")
-                if pkgname == '':
-                    pass
-                else:
-                    cloudrun.get(pkgname)
-            if cloudruncli == 'load':
-                print("Let CloudRun run scripts through a custom server")
-                print("The format should be like this: http://domain.com/filename.py")
-                url = input("Python script URL: ")
-                if url == '':
-                    pass
-                else:
-                    cloudrun.load(url)
-            if cloudruncli == 'editsource':
-                print('caution! The set software source must be in a standard format, otherwise it may not work, like http://127.0.0.1/, if you set http://127.0.0.1, it will not work properly, even if there is one less "/"!')
-                entersource = input("Please input sources server address: ")
-                cloudrun.editsource(entersource)
-                print("success!")
-            if cloudruncli == 'shell':
-                binpython_shell()
-            if cloudruncli == 'version':
-                print(f"CloudRun-{cloudrunver} BINPython version By:Edward Hsing(Xing Yu Jie) AGPL-3.0 LICENSE")
-            if cloudruncli == '':
-                pass
-            else:
-                pass
-            
+        cloudruncli()
+    if opt_name in ('-C','--cmd'):
+        binpython_cmd()
 #go main shell
 #custom welcome script
 try:
