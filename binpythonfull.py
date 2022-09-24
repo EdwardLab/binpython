@@ -20,6 +20,7 @@ libs_warning = "1"
 releases_ver = "offical"
 importlibs = "os"
 cloudrunver = "1.03"
+cmdver = "0.02"
 #Imported library name, please use "importlibs="<library name>" instead of "import <library name>"
 #Please note: The "importlibs" function does not support loading functions (such as from xxxx import xxxx, if necessary, please write it in the following location. However, please note that this operation may have the risk of error reporting, please report issues or solve it yourself
 #xxxxxxxxxxxxxx
@@ -298,6 +299,8 @@ def listfiles():
         print (file)
 
 def binpython_cmd():
+    global runpath
+    runpath = os.path.dirname(os.path.realpath(sys.argv[0]))
     try:
         global cmd_username
         defaultprofile = open("binpython_filesystem/userdata/defaultloginuser", "r")
@@ -341,7 +344,7 @@ def binpython_cmd():
             username = input("Username: ")
             print("create user...")
             try:
-                os.makedirs(f"binpython_filesystem/userdata/home/{username}")
+                os.makedirs(runpath + f"/binpython_filesystem/userdata/home/{username}")
             except(Exception, BaseException) as error:
                 print("User already exits or system error")
                 print(error)
@@ -365,17 +368,19 @@ def binpython_cmd():
             binpython_shell()
         def do_python(self, arg):
             'Run a Python script file (*.py) Usage: python <filename>.py'
+            if arg == '':
+                binpython_shell()
             f = open(arg, "r")
             exec(f.read())
         def do_seteditor(self, arg):
             'Set a default Python or Text file code editor usage: seteditor <editorname>. like: "seteditor code" (Open code via Visual Studio Code when using the "edit <filename>" command). "seteditor notepad" (Open the code through Notepad that comes with Windows)'
             scriptpath = os.path.dirname(os.path.realpath(sys.argv[0]))
-            defaulteditor = open("defaulteditor.config", "w")
+            defaulteditor = open(runpath + f"/binpython_filesystem/userdata/home/{cmd_username}/defaulteditor.config", "w")
             defaulteditor.write(arg)
         def do_edit(self, arg):
             'Before using this command, you must use "seteditor <editorname>" to set the editor (see the usage of this parameter for details), otherwise it cannot be called up. edit usage: edit <filename>'
             scriptpath = os.path.dirname(os.path.realpath(sys.argv[0]))
-            defaulteditor = open("defaulteditor.config", "r")
+            defaulteditor = open(runpath + f"/binpython_filesystem/userdata/home/{cmd_username}/defaulteditor.config", "r")
             os.system(defaulteditor.read() + ' ' + arg)
         def do_exit(self, arg):
             'exit shell'
@@ -406,8 +411,16 @@ def binpython_cmd():
             writetext = open(arg, "w")
             arg1 = input(f"What you want to write to the target file {arg}: ")
             writetext.write(arg1)
-            
-
+        def do_ukraine(self, arg):
+            'stand with ukraine'
+            print("We stand with Ukraine")
+            webbrowser.open("https://war.ukraine.ua/")
+        def do_uname(self, arg):
+            'version of CMD'
+            print(f"BINPython CMD By: Edward Hsing VER:{cmdver} ")
+        def do_user(self, arg):
+            'Change User'
+            os.chdir(runpath + f"/binpython_filesystem/userdata/home/{arg}")
 
     if __name__ == '__main__':
         cmdshell().cmdloop()
