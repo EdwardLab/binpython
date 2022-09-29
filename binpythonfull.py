@@ -104,8 +104,10 @@ try:
     import http.server
     import socketserver
 #except ImportError:
-except ImportError:
+except(Exception, BaseException) as error:
     print("Unable to use any library, the program does not work properly, please rebuild")
+    f = open("binpython_importerror.log", "a")
+    f.write('Import Error: ' + time.strftime('%m-%d-%Y %H:%M:%S',time.localtime(time.time())) + ' ' + str(error) + '\n')
 #gui import
 try:
     import tkinter
@@ -453,6 +455,14 @@ def binpython_cmd():
         def do_install(self, arg):
             'Install package'
             try:
+                os.makedirs(runpath + f"/binpython_files/apps/{cmd_username}")
+            except:
+                pass
+            try:
+                os.makedirs(runpath + f"/binpython_files/apps/{cmd_username}/installtemp")
+            except:
+                pass
+            try:
                 global appsource
                 f = open(runpath + f"/binpython_files/apps/source.config", "r")
                 appsource = f.read()
@@ -463,14 +473,6 @@ def binpython_cmd():
             if arg == '':
                 print("Please use install <package name> missing options <package name>")
                 exit()
-            try:
-                os.makedirs(runpath + f"/binpython_files/apps/{cmd_username}")
-            except:
-                pass
-            try:
-                os.makedirs(runpath + f"/binpython_files/apps/{cmd_username}/installtemp")
-            except:
-                pass
             try:
                 print("[*] download package")
                 wget.download(f"{appsource}{arg}.bpkg", runpath + f"/binpython_files/apps/{cmd_username}/installtemp/{arg}.bpkg")
@@ -540,7 +542,7 @@ def binpython_cmd():
                 f = open(runpath + f"/binpython_files/apps/{cmd_username}/{arg}/main.py")
                 exec(f.read())
             except(Exception, BaseException) as error:
-                print('Runapp failed, please see the log "binpython_pkg_error.log" for details')
+                print('App not exits or failed, please see the log "binpython_pkg_error.log" for details')
                 f = open("binpython_pkg_error.log", "a")
                 f.write('Run package Error: ' + time.strftime('%m-%d-%Y %H:%M:%S',time.localtime(time.time())) + ' ' + str(error) + '\n')
     if __name__ == '__main__':

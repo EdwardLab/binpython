@@ -3,3 +3,5 @@ pyinstaller
 pywebio
 tornado
 xlrd
+wget
+requests
