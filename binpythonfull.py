@@ -10,7 +10,7 @@
 ####################################
 #build configure
 
-ver = "0.40-build-full"
+ver = "0.41-build-full"
 
 libs_warning = "1"
 #1 is ture 0 is false.
@@ -20,7 +20,7 @@ libs_warning = "1"
 releases_ver = "offical"
 importlibs = "os"
 cloudrunver = "1.03"
-cmdver = "0.02"
+cmdver = "0.04"
 #Imported library name, please use "importlibs="<library name>" instead of "import <library name>"
 #Please note: The "importlibs" function does not support loading functions (such as from xxxx import xxxx, if necessary, please write it in the following location. However, please note that this operation may have the risk of error reporting, please report issues or solve it yourself
 #xxxxxxxxxxxxxx
@@ -93,6 +93,11 @@ try:
     import urllib.request
     import base64
     import cmd
+    import zipfile
+    import requests
+    import urllib
+    import wget
+
 #fix for exit()
     from sys import exit
 #import for http_server
@@ -297,21 +302,48 @@ def listfiles():
     dirs = os.listdir("./")
     for file in dirs:
         print (file)
+def download(url,path):
+    if not os.path.exists(path):
+         os.mkdir(path)
+    start = time.time()
+    response = requests.get(url, stream=True)
+    size = 0  
+    chunk_size = 1024 
+    content_size = int(response.headers['content-length'])
+    try:
+        if response.status_code == 200:
+            print('Start download,[App size]:{size:.2f} MB'.format(size = content_size / chunk_size /1024)) 
+            filepath = path+'\name.extension name'
+            with open(filepath,'wb') as file:
+                for data in response.iter_content(chunk_size = chunk_size):
+                    file.write(data)
+                    size +=len(data)
+                    print('\r'+'[Downloading]:%s%.2f%%' % ('>'*int(size*50/ content_size), float(size / content_size * 100)) ,end=' ')
+        end = time.time() 
+        print('Download completed!,times: %.2f second' % (end - start))
+    except:
+        print("Download package failed!")
+def unzip(path, folder_abs):
+    zip_file = zipfile.ZipFile(path)
+    zip_list = zip_file.namelist() 
 
+    for f in zip_list:
+        zip_file.extract(f, folder_abs)
+ 
+    zip_file.close()
 def binpython_cmd():
     global runpath
     runpath = os.path.dirname(os.path.realpath(sys.argv[0]))
     try:
         global cmd_username
-        defaultprofile = open("binpython_filesystem/userdata/defaultloginuser", "r")
+        defaultprofile = open("binpython_files/userdata/defaultloginuser", "r")
         cmd_username = defaultprofile.read()
-        os.chdir(f"binpython_filesystem/userdata/home/{cmd_username}")
+        os.chdir(f"binpython_files/userdata/home/{cmd_username}")
     except:
         cmd_username = 'user'
         print('Unable to switch to BINPython userprofile: Default user not found. To use a temporary directory user, use "adddefaultuser" to create a default user')
     try:
-        scriptpath = os.path.dirname(os.path.realpath(sys.argv[0]))
-        gethostname = open(scriptpath + "/binpython_filesystem/hostname/hostname", "r")
+        gethostname = open(runpath + "/binpython_files/hostname/hostname", "r")
         cmd_hostname = gethostname.read()
     except:
         cmd_hostname = "binpython"
@@ -344,7 +376,7 @@ def binpython_cmd():
             username = input("Username: ")
             print("create user...")
             try:
-                os.makedirs(runpath + f"/binpython_filesystem/userdata/home/{username}")
+                os.makedirs(runpath + f"/binpython_files/userdata/home/{username}")
             except(Exception, BaseException) as error:
                 print("User already exits or system error")
                 print(error)
@@ -357,10 +389,10 @@ def binpython_cmd():
             username = input("Default Username: ")
             print("create user...")
             try:
-                os.makedirs(scriptpath + f"/binpython_filesystem/userdata/home/{username}")
+                os.makedirs(scriptpath + f"/binpython_files/userdata/home/{username}")
             except:
                 pass
-            defaultprofile = open(scriptpath + "/binpython_filesystem/userdata/defaultloginuser", "w")
+            defaultprofile = open(scriptpath + "/binpython_files/userdata/defaultloginuser", "w")
             defaultprofile.write(username)
             print("Done")
         def do_shell(self, arg):
@@ -374,25 +406,22 @@ def binpython_cmd():
             exec(f.read())
         def do_seteditor(self, arg):
             'Set a default Python or Text file code editor usage: seteditor <editorname>. like: "seteditor code" (Open code via Visual Studio Code when using the "edit <filename>" command). "seteditor notepad" (Open the code through Notepad that comes with Windows)'
-            scriptpath = os.path.dirname(os.path.realpath(sys.argv[0]))
-            defaulteditor = open(runpath + f"/binpython_filesystem/userdata/home/{cmd_username}/defaulteditor.config", "w")
+            defaulteditor = open(runpath + f"/binpython_files/userdata/home/{cmd_username}/defaulteditor.config", "w")
             defaulteditor.write(arg)
         def do_edit(self, arg):
             'Before using this command, you must use "seteditor <editorname>" to set the editor (see the usage of this parameter for details), otherwise it cannot be called up. edit usage: edit <filename>'
-            scriptpath = os.path.dirname(os.path.realpath(sys.argv[0]))
-            defaulteditor = open(runpath + f"/binpython_filesystem/userdata/home/{cmd_username}/defaulteditor.config", "r")
+            defaulteditor = open(runpath + f"/binpython_files/userdata/home/{cmd_username}/defaulteditor.config", "r")
             os.system(defaulteditor.read() + ' ' + arg)
         def do_exit(self, arg):
             'exit shell'
             sys.exit()
         def do_sethostname(self, arg):
             'set up hostname. Usage sethostname <hostname>'
-            scriptpath = os.path.dirname(os.path.realpath(sys.argv[0]))
             try:
-                os.makedirs(scriptpath + "/binpython_filesystem/hostname/")
+                os.makedirs(runpath + "/binpython_files/hostname/")
             except:
                 pass
-            hostnamefile = open(scriptpath + "/binpython_filesystem/hostname/hostname", "w")
+            hostnamefile = open(runpath + "/binpython_files/hostname/hostname", "w")
             hostnamefile.write(arg)
         def do_rm(self, arg):
             'remove files Usage: rm <filename>'
@@ -420,8 +449,100 @@ def binpython_cmd():
             print(f"BINPython CMD By: Edward Hsing VER:{cmdver} ")
         def do_user(self, arg):
             'Change User'
-            os.chdir(runpath + f"/binpython_filesystem/userdata/home/{arg}")
-
+            os.chdir(runpath + f"/binpython_files/userdata/home/{arg}")
+        def do_install(self, arg):
+            'Install package'
+            try:
+                global appsource
+                f = open(runpath + f"/binpython_files/apps/source.config", "r")
+                appsource = f.read()
+            except:
+                f = open(runpath + f"/binpython_files/apps/source.config", "w")
+                f.write("https://raw.githubusercontent.com/xingyujie/binpython-repository/main/")
+                appsource = "https://raw.githubusercontent.com/xingyujie/binpython-repository/main/"
+            if arg == '':
+                print("Please use install <package name> missing options <package name>")
+                exit()
+            try:
+                os.makedirs(runpath + f"/binpython_files/apps/{cmd_username}")
+            except:
+                pass
+            try:
+                os.makedirs(runpath + f"/binpython_files/apps/{cmd_username}/installtemp")
+            except:
+                pass
+            try:
+                print("[*] download package")
+                wget.download(f"{appsource}{arg}.bpkg", runpath + f"/binpython_files/apps/{cmd_username}/installtemp/{arg}.bpkg")
+                print("\n")
+            except(Exception, BaseException) as error:
+                print('The package does not exist or system error, please see the log "install_error.log" for details')
+                f = open("install_error.log", "a")
+                f.write('Install Error: ' + time.strftime('%m-%d-%Y %H:%M:%S',time.localtime(time.time())) + ' ' + str(error) + '\n')
+            try:
+                print("[*] Unzip the package")
+                unzip(runpath + f"/binpython_files/apps/{cmd_username}/installtemp/{arg}.bpkg", runpath + f"/binpython_files/apps/{cmd_username}/{arg}")
+            except(Exception, BaseException) as error:
+                print('Unzip the package failed, please see the log "install_error.log" for details')
+                f = open("install_error.log", "a")
+                f.write('Unzip package Error: ' + time.strftime('%m-%d-%Y %H:%M:%S',time.localtime(time.time())) + ' ' + str(error) + '\n')
+            try:
+                print("[*] configure package")
+                f = open(runpath + f"/binpython_files/apps/{cmd_username}/{arg}/config.py")
+                exec(f.read())
+            except(Exception, BaseException) as error:
+                print('[W] Warning: config file no configuration or configuration error, please see the log "install_warning.log" for details')
+                f = open("install_warning.log", "a")
+                f.write('Run package configuration file Warning: ' + time.strftime('%m-%d-%Y %H:%M:%S',time.localtime(time.time())) + ' ' + str(error) + '\n')
+            try:
+                print("[*] Clean up temporary files")
+                os.remove(runpath + f"/binpython_files/apps/{cmd_username}/installtemp/{arg}.bpkg")
+            except(Exception, BaseException) as error:
+                print('Failed to clean up temporary files, please see the log "install_error.log" for details')
+                f = open("install_error.log", "a")
+                f.write('clean up temporary files Error: ' + time.strftime('%m-%d-%Y %H:%M:%S',time.localtime(time.time())) + ' ' + str(error) + '\n')
+            print("[OK]Finished!")
+        def do_installfile(self, arg):
+            'Install package from local bpkg file'
+            if arg == '':
+                print("Please use install <package file name> missing options <package file name>")
+                exit()
+            try:
+                os.makedirs(runpath + f"/binpython_files/apps/{cmd_username}")
+            except:
+                pass
+            try:
+                os.makedirs(runpath + f"/binpython_files/apps/{cmd_username}/installtemp")
+            except:
+                pass
+            try:
+                print("[*] Unzip the package")
+                unzip(arg, runpath + f"/binpython_files/apps/{cmd_username}/{arg}")
+            except(Exception, BaseException) as error:
+                print('Unzip the package failed, please see the log "install_error.log" for details')
+                f = open("install_error.log", "a")
+                f.write('Unzip package Error: ' + time.strftime('%m-%d-%Y %H:%M:%S',time.localtime(time.time())) + ' ' + str(error) + '\n')
+            try:
+                print("[*] configure package")
+                f = open(runpath + f"/binpython_files/apps/{cmd_username}/{arg}/config.py")
+                exec(f.read())
+            except(Exception, BaseException) as error:
+                print('[W]config file no configuration or configuration error, please see the log "install_warning.log" for details')
+                f = open("install_warning.log", "a")
+                f.write('Run package configuration file Error: ' + time.strftime('%m-%d-%Y %H:%M:%S',time.localtime(time.time())) + ' ' + str(error) + '\n')
+            print("[OK]Finished!")
+        def do_switchappdir(self, arg):
+            'Switch to App dir. Usage: switchappdir <appname>'
+            os.chdir(runpath + f"/binpython_files/apps/{cmd_username}/{arg}")
+        def do_runapp(self, arg):
+            'To run a BINPython bpkg program, first pass install <app name> or installfile <app package path> Usage: runapp <appname>. '
+            try:
+                f = open(runpath + f"/binpython_files/apps/{cmd_username}/{arg}/main.py")
+                exec(f.read())
+            except(Exception, BaseException) as error:
+                print('Runapp failed, please see the log "binpython_pkg_error.log" for details')
+                f = open("binpython_pkg_error.log", "a")
+                f.write('Run package Error: ' + time.strftime('%m-%d-%Y %H:%M:%S',time.localtime(time.time())) + ' ' + str(error) + '\n')
     if __name__ == '__main__':
         cmdshell().cmdloop()
 #cmd end
