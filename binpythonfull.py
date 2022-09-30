@@ -42,12 +42,10 @@ class binpythoninfo:
 
     def build_importlibs():
         print(importlibs)
-from email.policy import default
 from os import makedirs
 import time
 #get system info(windows or linux ...)
 import platform
-from xmlrpc.server import CGIXMLRPCRequestHandler
 sys = platform.system()
 #if system is windows, then enable setwindowtitle() function
 if sys == "Windows":
