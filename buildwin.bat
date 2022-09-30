@@ -1,2 +1,2 @@
 @ECHO OFF
-pyinstaller binpythonfull.spec
+pyinstaller binpython.spec
