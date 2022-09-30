@@ -10,7 +10,7 @@
 ####################################
 #build configure
 
-ver = "0.41-build-full"
+ver = "0.43-build-full"
 
 libs_warning = "1"
 #1 is ture 0 is false.
@@ -19,8 +19,8 @@ libs_warning = "1"
 
 releases_ver = "offical"
 importlibs = "os"
-cloudrunver = "1.03"
-cmdver = "0.04"
+cloudrunver = "1.04"
+cmdver = "0.06"
 #Imported library name, please use "importlibs="<library name>" instead of "import <library name>"
 #Please note: The "importlibs" function does not support loading functions (such as from xxxx import xxxx, if necessary, please write it in the following location. However, please note that this operation may have the risk of error reporting, please report issues or solve it yourself
 #xxxxxxxxxxxxxx
@@ -97,6 +97,7 @@ try:
     import requests
     import urllib
     import wget
+    import shutil
 
 #fix for exit()
     from sys import exit
@@ -197,7 +198,9 @@ try:
     optreadfile()
 except:
     pass
-
+def execpyfile(filename):
+    f = open(filename)
+    exec(f.read())
 def cloudruncli():
            
         print("Welcome to CloudRun CLI. Let your script run in the cloud with BINPython")
@@ -302,6 +305,11 @@ class cloudrun:
 def listfiles():
     import os
     dirs = os.listdir("./")
+    for file in dirs:
+        print (file)
+def listfilesfunc(path):
+    import os
+    dirs = os.listdir(path)
     for file in dirs:
         print (file)
 def download(url,path):
@@ -413,7 +421,10 @@ def binpython_cmd():
         def do_edit(self, arg):
             'Before using this command, you must use "seteditor <editorname>" to set the editor (see the usage of this parameter for details), otherwise it cannot be called up. edit usage: edit <filename>'
             defaulteditor = open(runpath + f"/binpython_files/userdata/home/{cmd_username}/defaulteditor.config", "r")
-            os.system(defaulteditor.read() + ' ' + arg)
+            try:
+                os.system(defaulteditor.read() + ' ' + arg)
+            except KeyboardInterrupt:
+                pass
         def do_exit(self, arg):
             'exit shell'
             sys.exit()
@@ -480,7 +491,8 @@ def binpython_cmd():
             except(Exception, BaseException) as error:
                 print('The package does not exist or system error, please see the log "install_error.log" for details')
                 f = open("install_error.log", "a")
-                f.write('Install Error: ' + time.strftime('%m-%d-%Y %H:%M:%S',time.localtime(time.time())) + ' ' + str(error) + '\n')
+                f.write('Install Error: ' + time.strftime('%m-%d-%Y %H:%M:%S',time.localtime(time.time())) + f" {appsource}{arg}.bpkg " + str(error) +'\n')
+                exit()
             try:
                 print("[*] Unzip the package")
                 unzip(runpath + f"/binpython_files/apps/{cmd_username}/installtemp/{arg}.bpkg", runpath + f"/binpython_files/apps/{cmd_username}/{arg}")
@@ -534,8 +546,13 @@ def binpython_cmd():
                 f.write('Run package configuration file Error: ' + time.strftime('%m-%d-%Y %H:%M:%S',time.localtime(time.time())) + ' ' + str(error) + '\n')
             print("[OK]Finished!")
         def do_switchappdir(self, arg):
-            'Switch to App dir. Usage: switchappdir <appname>'
-            os.chdir(runpath + f"/binpython_files/apps/{cmd_username}/{arg}")
+            'Switch to App directory. Usage: switchappdir <appname>'
+            try:
+                os.chdir(runpath + f"/binpython_files/apps/{cmd_username}/{arg}")
+            except(Exception, BaseException) as error:
+                print('Can not switch app directory, please see the log "binpython_pkg_error.log" for details')
+                f = open("binpython_pkg_error.log", "a")
+                f.write('Switch package directory Error: ' + time.strftime('%m-%d-%Y %H:%M:%S',time.localtime(time.time())) + ' ' + str(error) + '\n')
         def do_runapp(self, arg):
             'To run a BINPython bpkg program, first pass install <app name> or installfile <app package path> Usage: runapp <appname>. '
             try:
@@ -545,6 +562,26 @@ def binpython_cmd():
                 print('App not exits or failed, please see the log "binpython_pkg_error.log" for details')
                 f = open("binpython_pkg_error.log", "a")
                 f.write('Run package Error: ' + time.strftime('%m-%d-%Y %H:%M:%S',time.localtime(time.time())) + ' ' + str(error) + '\n')
+        def do_removeapp(self, arg):
+            'To delete a BINPython application, usage: removeapp <appname>'
+            try:
+                shutil.rmtree(runpath + f"/binpython_files/apps/{cmd_username}/{arg}")
+            except(Exception, BaseException) as error:
+                print('App not exits or failed, please see the log "binpython_pkg_error.log" for details')
+                f = open("binpython_pkg_error.log", "a")
+                f.write('Remove package Error: ' + time.strftime('%m-%d-%Y %H:%M:%S',time.localtime(time.time())) + ' ' + str(error) + '\n')
+        def do_listapps(self, arg):
+            'List installed BINPython applications'
+            try:
+                listfilesfunc(runpath + f"/binpython_files/apps/{cmd_username}")
+            except(Exception, BaseException) as error:
+                print('Can not list apps, please see the log "binpython_pkg_error.log" for details')
+                f = open("binpython_pkg_error.log", "a")
+                f.write('List package Error: ' + time.strftime('%m-%d-%Y %H:%M:%S',time.localtime(time.time())) + ' ' + str(error) + '\n')
+        def do_editsouce(self, arg):
+            'To change the software source, usage: editsouce <souceurl>. Please pay attention to the software source specification, otherwise you will get an error. <souceurl> like this: http://xxx.com/'
+            f = open(runpath + f"/binpython_files/apps/source.config", "w")
+            f.write(arg)
     if __name__ == '__main__':
         cmdshell().cmdloop()
 #cmd end
