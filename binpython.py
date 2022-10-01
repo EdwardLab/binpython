@@ -10,7 +10,7 @@
 ####################################
 #build configure
 
-ver = "0.43"
+ver = "0.44"
 
 libs_warning = "1"
 #1 is ture 0 is false.
@@ -20,7 +20,7 @@ libs_warning = "1"
 releases_ver = "offical"
 importlibs = "os"
 cloudrunver = "1.04"
-cmdver = "0.06"
+cmdver = "0.08"
 #Imported library name, please use "importlibs="<library name>" instead of "import <library name>"
 #Please note: The "importlibs" function does not support loading functions (such as from xxxx import xxxx, if necessary, please write it in the following location. However, please note that this operation may have the risk of error reporting, please report issues or solve it yourself
 #xxxxxxxxxxxxxx
@@ -213,7 +213,8 @@ load -- Run scripts from custom URL
 editsource -- Set up custom sources and save via configuration files
 shell -- Go to BINPython Shell
 version -- CloudRun Version
-help -- show this help             
+help -- show this help    
+exit -- quit cloudrun         
                 """)
             if cloudruncli == 'get':
                 print("Get apps/scripts in software repository")
@@ -241,6 +242,8 @@ help -- show this help
                 binpython_shell()
             if cloudruncli == 'version':
                 print(f"CloudRun-{cloudrunver} BINPython version By:Edward Hsing(Xing Yu Jie) AGPL-3.0 LICENSE")
+            if cloudruncli == 'exit':
+                exit()
             if cloudruncli == '':
                 pass
             else:
@@ -349,16 +352,27 @@ def binpython_cmd():
         os.chdir(f"binpython_files/userdata/home/{cmd_username}")
     except:
         cmd_username = 'user'
-        print('Unable to switch to BINPython userprofile: Default user not found. To use a temporary directory user, use "adddefaultuser" to create a default user')
+        print('Unable to switch to BINPython userprofile: Default user not found. To use a temporary directory user, use "adduser" and "setdefaultuser <username>" to create a user and set default user')
     try:
         gethostname = open(runpath + "/binpython_files/hostname/hostname", "r")
         cmd_hostname = gethostname.read()
     except:
         cmd_hostname = "binpython"
+    try:
+        shutil.rmtree(runpath + f"/binpython_files/userdata/home/tempuser")
+        shutil.rmtree(runpath + f"/binpython_files/apps/tempuser")
+    except:
+        pass
     class cmdshell(cmd.Cmd):
         intro = 'Welcome to BINPython Shell. Type help or ? to list commands and help.\n'
-        prompt = cmd_username + '@' + cmd_hostname + ':' + '# '
+        prompt = cmd_username + '@' + cmd_hostname + ':# '
         file = None
+        try:
+            f = open(runpath + f"/binpython_files/cmd/cmd.py", "r")
+            exec(f.read())
+        except(Exception, BaseException) as error:
+            f = open(runpath + f"/binpython_files/cmd/cmd_ignore.txt", "a")
+            f.write('Custom CMD ignore: ' + time.strftime('%m-%d-%Y %H:%M:%S',time.localtime(time.time())) + ' ' + str(error) + '\n')
         def do_cloudrunget(self, arg):
             'Get CloudRun Script from repository use:cloudrunget <scriptname>'
             cloudrun.get(arg)        
@@ -389,19 +403,10 @@ def binpython_cmd():
                 print("User already exits or system error")
                 print(error)
             print("Done")
-        def do_adddefaultuser(self, arg):
-            'Create a default user'
-            global scriptpath
-            scriptpath = os.path.dirname(os.path.realpath(sys.argv[0]))
-            print("Create a default login user for BINPython")
-            username = input("Default Username: ")
-            print("create user...")
-            try:
-                os.makedirs(scriptpath + f"/binpython_files/userdata/home/{username}")
-            except:
-                pass
-            defaultprofile = open(scriptpath + "/binpython_files/userdata/defaultloginuser", "w")
-            defaultprofile.write(username)
+        def do_setdefaultuser(self, arg):
+            'Set a default user'
+            defaultprofile = open(runpath + "/binpython_files/userdata/defaultloginuser", "w")
+            defaultprofile.write(arg)
             print("Done")
         def do_shell(self, arg):
             'Go to Python interpreter'
@@ -425,6 +430,7 @@ def binpython_cmd():
                 pass
         def do_exit(self, arg):
             'exit shell'
+            print("logout")
             sys.exit()
         def do_sethostname(self, arg):
             'set up hostname. Usage sethostname <hostname>'
@@ -459,8 +465,15 @@ def binpython_cmd():
             'version of CMD'
             print(f"BINPython CMD By: Edward Hsing VER:{cmdver} ")
         def do_user(self, arg):
-            'Change User'
+            'Switch User Usage: user <username>'
             os.chdir(runpath + f"/binpython_files/userdata/home/{arg}")
+            try:
+                f = open(runpath + "/binpython_files/userdata/defaultloginuser", "w")
+                f.write(arg)
+            except(Exception, BaseException) as error:
+                print('Switch User Error, please see the log "binpython_user_error.log" for details')
+                f = open("binpython_user_error.log", "a")
+                f.write('Switch User Error: ' + time.strftime('%m-%d-%Y %H:%M:%S',time.localtime(time.time())) + ' ' + str(error) + '\n')
         def do_install(self, arg):
             'Install package'
             try:
@@ -580,6 +593,50 @@ def binpython_cmd():
             'To change the software source, usage: editsouce <souceurl>. Please pay attention to the software source specification, otherwise you will get an error. <souceurl> like this: http://xxx.com/'
             f = open(runpath + f"/binpython_files/apps/source.config", "w")
             f.write(arg)
+        def do_tempuser(self, arg):
+            'Create a temporary user, logging out will destroy the user space'
+            print("You are trying to create a temporary user, this user space is only used for demonstration, testing and learning. When this user is logged out, all user data will also be deleted")
+            print("..........")
+            time.sleep(0.3)
+            print('Please note: the username of the temporary user is "tempuser" and the "tempuser" user is being created')
+            try:
+                os.makedirs(runpath + f"/binpython_files/apps/tempuser")
+                os.makedirs(runpath + f"/binpython_files/userdata/home/tempuser")
+            except(Exception, BaseException) as error:
+                print('Can not create tempuser, please see the log "binpython_user_error.log" for details')
+                f = open("binpython_user_error.log", "a")
+                f.write('Switch tempuser Error: ' + time.strftime('%m-%d-%Y %H:%M:%S',time.localtime(time.time())) + ' ' + str(error) + '\n')
+            os.chdir(runpath + f"/binpython_files/userdata/home/tempuser")
+            print("Created successfully, has switched to the tempuser directory")
+        def do_repolist(self, arg):
+            'Change the BINPython source from the official list'
+            cloudrun.load("https://raw.githubusercontent.com/xingyujie/binpython-repository/main/source.py")
+        def do_cloudrunshell(self, arg):
+            'Go to CloudRun Shell'
+            cloudruncli()
+        def do_whoami(self, arg):
+            'Print Username'
+            print(cmd_username)
+        def do_hostname(self, arg):
+            'Print Hostname'
+            print(cmd_hostname)
+        def do_rootpath(self, arg):
+            'Print rootpath(runpath)'
+            print(runpath)
+        def do_initcmd(self, arg):
+            'Initialize the custom CMD command file. After opening, you can use the "def do_cloudrunget(self, arg):" code to write your own commands through the "/binpython_files/cmd/cmd.py" file.'
+            try:
+                os.makedirs(runpath + f"/binpython_files/cmd")
+            except:
+                pass
+            try:
+                f = open(runpath + f"/binpython_files/cmd/{arg}.py", "w")
+                f.write('#Initialize the custom CMD command file, you can write your own command through the "def do_cloudrunget(self, arg):" code, please refer to "https://docs.python.org/3/library/cmd.html" for details')
+            except(Exception, BaseException) as error:
+                print('Can not initcmd, please see the log "binpython_cmd_error.log" for details')
+                f = open("binpython_cmd_error.log", "a")
+                f.write('Init CMD Error: ' + time.strftime('%m-%d-%Y %H:%M:%S',time.localtime(time.time())) + ' ' + str(error) + '\n')
+
     if __name__ == '__main__':
         cmdshell().cmdloop()
 #cmd end
@@ -598,8 +655,7 @@ Options:
 -i            --idle               Open BINPython IDLE Code Editor
 -p <port>     --plus=<port>        Open BINPython IDE Plus Code Editor(beta) with http web server
 -e            --example            Run various code examples through BINPython
--c            --cloudrun           Run Python scripts in the cloud via CloudRun (into CloudRun CLI)
--C            --cmd                Operations on BINPython (including Package Manager, CloudRun, etc.)
+-c            --cmd                Operations on BINPython (including Package Manager, CloudRun, etc.)
 -v            --version            View BINPython Version
 """
 #base + plus, print full help
@@ -614,7 +670,7 @@ about = "BINPython " + ver + "-" + releases_ver + " By: Edward Hsing(Xing Yu Jie
 #getopt
 try:
 #set options
-    opts,args = getopt.getopt(sys.argv[1:],'-h-f:-s:-g-i-p:-e-c-C-v',['help','file=','server=','gui','idle','plus','example','cloudrun','cmd','version'])
+    opts,args = getopt.getopt(sys.argv[1:],'-h-f:-s:-g-i-p:-e-c-v',['help','file=','server=','gui','idle','plus','example','cmd','version'])
 #set getopt error prompt
 except getopt.GetoptError as err:
     print("Please check help:")
@@ -948,9 +1004,7 @@ List of examples:
             binpython_shell()
             sys.exit()
 
-    if opt_name in ('-c','--cloudrun'):
-        cloudruncli()
-    if opt_name in ('-C','--cmd'):
+    if opt_name in ('-c','--cmd'):
         binpython_cmd()
 #go main shell
 #custom welcome script
