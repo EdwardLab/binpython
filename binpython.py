@@ -149,6 +149,8 @@ except ImportError:
     if libs_warning == "1":
         print("Warning: Some file manipulation libraries for BINPython do not exist, such as filecmp and tempfile.  Because they weren't built when they were built.  If you need to fix this warning, please complete the support libraries imported in the source code when building (use pip or build it yourself), if your system does not support these libraries, you can remove or change this prompt in the source code and rebuild")
         print("")
+
+
 #main BINPython
 def binpython_welcome_text():
     print("BINPython " + ver + "-" + releases_ver + " (Python Version:" + platform.python_version() + ") By: Edward Hsing(Xing Yu Jie) https://github.com/xingyujie/binpython[Running on " + platform.platform() + " " + platform.version() + "]")
@@ -367,6 +369,10 @@ def binpython_cmd():
         intro = 'Welcome to BINPython Shell. Type help or ? to list commands and help.\n'
         prompt = cmd_username + '@' + cmd_hostname + ':# '
         file = None
+        try:
+            os.makedirs(runpath + f"/binpython_files/cmd/")
+        except:
+            pass
         try:
             f = open(runpath + f"/binpython_files/cmd/cmd.py", "r")
             exec(f.read())
@@ -589,7 +595,7 @@ def binpython_cmd():
                 print('Can not list apps, please see the log "binpython_pkg_error.log" for details')
                 f = open("binpython_pkg_error.log", "a")
                 f.write('List package Error: ' + time.strftime('%m-%d-%Y %H:%M:%S',time.localtime(time.time())) + ' ' + str(error) + '\n')
-        def do_editsouce(self, arg):
+        def do_editsource(self, arg):
             'To change the software source, usage: editsouce <souceurl>. Please pay attention to the software source specification, otherwise you will get an error. <souceurl> like this: http://xxx.com/'
             f = open(runpath + f"/binpython_files/apps/source.config", "w")
             f.write(arg)
@@ -636,6 +642,7 @@ def binpython_cmd():
                 print('Can not initcmd, please see the log "binpython_cmd_error.log" for details')
                 f = open("binpython_cmd_error.log", "a")
                 f.write('Init CMD Error: ' + time.strftime('%m-%d-%Y %H:%M:%S',time.localtime(time.time())) + ' ' + str(error) + '\n')
+
 
     if __name__ == '__main__':
         cmdshell().cmdloop()
