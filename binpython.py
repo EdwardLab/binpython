@@ -1,9 +1,3 @@
-"""
- @header binpython.py
- @author xingyujie https://github.com/xingyujie
- @abstract BINPython main file
-"""
-
 #BINPython By:XINGYUJIE AGPL-V3.0 LICENSE Release
 #Please follow the LICENSE AGPL-V3
 #full version
@@ -28,6 +22,7 @@ cmdver = "0.08"
 #from xxxx import xxxx
 #xxxxxxxxxxxxxx
 ####################################
+
 #BINPython function and variable START
 
 class binpythoninfo:
@@ -96,12 +91,13 @@ try:
     import urllib
     import wget
     import shutil
-
+    import json
 #fix for exit()
     from sys import exit
 #import for http_server
     import http.server
     import socketserver
+    import flask
 #except ImportError:
 except(Exception, BaseException) as error:
     print("Unable to use any library, the program does not work properly, please rebuild")
@@ -154,7 +150,7 @@ except ImportError:
 #main BINPython
 def binpython_welcome_text():
     print("BINPython " + ver + "-" + releases_ver + " (Python Version:" + platform.python_version() + ") By: Edward Hsing(Xing Yu Jie) https://github.com/xingyujie/binpython[Running on " + platform.platform() + " " + platform.version() + "]")
-    print('Type "about", "help", "copyright", "credits" or "license" for more information.')
+    print('Type "about", "help", "copyright", "credits" or "license" for more information. Type "binpython_cmd" to enter BINPython CMD')
 def binpython_shell():
     while True:
         try:
@@ -187,6 +183,8 @@ Thanks to CWI, CNRI, BeOpen.com, Zope Corporation and a cast of thousands
     """)
             elif pycmd == 'license':
                 print("Type license() to see the full license text")
+            elif pycmd == 'binpython_cmd':
+                binpython_cmd()
             else:
                 exec(pycmd)
         except KeyboardInterrupt:
@@ -198,9 +196,6 @@ try:
     optreadfile()
 except:
     pass
-def execpyfile(filename):
-    f = open(filename)
-    exec(f.read())
 def cloudruncli():
            
         print("Welcome to CloudRun CLI. Let your script run in the cloud with BINPython")
@@ -305,6 +300,10 @@ class cloudrun:
 #cloudrun functions end
 
 #cmd start
+def get_resource_path(relative_path):
+    if hasattr(sys, '_MEIPASS'):
+        return os.path.join(sys._MEIPASS, relative_path)
+    return os.path.join(os.path.abspath("."), relative_path)
 def listfiles():
     import os
     dirs = os.listdir("./")
@@ -344,14 +343,133 @@ def unzip(path, folder_abs):
         zip_file.extract(f, folder_abs)
  
     zip_file.close()
+def mkbpfs():
+    print("Welcome to bpfs[BINPython File System] making tool (mkfs.bpfs). Type help to list commands and help.")
+    while True:
+        cmd = input("(BPFS CLI) ")
+        if cmd == 'mkfs':
+            print("Make a new bpfs filesystem")
+            fspath = input("Enter the bpfs save path of the file system: ")
+            try:
+                os.mkdir(fspath)
+            except:
+                pass
+            try:
+                os.chdir(fspath)
+                print("[*] Done.")
+            except:
+                print("[E] path does not exist!")
+            print("[*] Make base file system")
+            try:
+                os.makedirs("binpython_files/apps")
+                os.makedirs("binpython_files/cmd")
+                os.makedirs("binpython_files/hostname")
+                os.makedirs("binpython_files/userdata")
+                open("binpython_files/cmd/cmd.py", "w")
+            except(Exception, BaseException) as error:
+                print("make dirs and files Error." + error)
+            try:
+                hostnameyn = input("do you want to create hostname(y/n): ")
+                if hostnameyn == 'y':
+                    hostnamecontent = input("enter hostname: ")
+                    with open("binpython_files/hostname/hostname", "w") as sethostname:
+                        sethostname.write(hostnamecontent)
+                    print("[*] Done.")
+                else:
+                    pass
+            except(Exception, BaseException) as error:
+                print("makehostname Error." + error)
+            try:
+                usernameyn = input("do you want to set default login user(y/n): ")
+                if usernameyn == 'y':
+                    usernamecontent = input("enter default login username: ")
+                    with open("binpython_files/userdata/defaultloginuser", "w") as setusername:
+                        setusername.write(usernamecontent)
+                    os.makedirs(f"binpython_files/userdata/home/{usernamecontent}")
+                    print("[*] Done.")
+                else:
+                    pass
+            except(Exception, BaseException) as error:
+                print("Set default username Error. " + error)
+        if cmd == 'help':
+            print("""
+List commands:
+mkfs -- Make a new bpfs filesystem
+help -- This help
+exit -- exit mkbpfs
+            """)
+        if cmd == 'exit':
+            binpython_cmd()
+def getfsfile(path):
+    try:
+        os.mkdir("binpython_files")
+    except:
+        pass
+        print("[*] Unzip File System BPFS(BINPython File System) from file")
+        unzip(path, runpath + "/binpython_files")
+        print("\n")
+        print("[*] Done!")
+        binpython_cmd()
+def downfs(bpfsurl):
+    try:
+        os.mkdir("binpython_files")
+    except:
+        pass
+        print("[*] Download File System BPFS(BINPython File System)")
+        wget.download(bpfsurl, runpath + "/binpython_files")
+        unzip(runpath + "/binpython_files/officialbpfs.bpfs", runpath + "/binpython_files")
+        print("\n")
+        print("[*] Done!")
+        binpython_cmd()
 def binpython_cmd():
     global runpath
     runpath = os.path.dirname(os.path.realpath(sys.argv[0]))
     try:
+        os.chdir(runpath + f"/binpython_files/userdata/")
+        os.chdir(runpath + f"/binpython_files/cmd")
+    except:
+        whichmethod = input("""
+Welcome to BINPython CMD! Choose a method to install BINPython CMD:
+1. WEB graphical interactive installation (recommended)
+2. Interactive text interface (also for non-graphical devices)
+Please enter a number (1/2): 
+""")
+        if whichmethod == '1':
+            getwebui = open(get_resource_path('webui.py'))
+            webui = getwebui.read()
+            exec(webui)
+        if whichmethod == '2':
+            print('''
+    The file system cannot be found or there is an incomplete file system.
+    type "getfs" to download a file system;
+    type "getfsurl" to download a filesystem via a custom url;
+    Type "getfsfile" to unzip the filesystem via file;
+    type "mkbpfs" to make a new file system;
+    type "exit" to exit;
+    type "shell" to force entry into the shell.
+    * After forcing into the shell, you can create bpfs via "mkbpfs" command or use "adduser", "setdefaultuser" and other commands to build the filesystem step by step. But we don't recommend it, it may be more problematic and more complex
+    ''')
+            while True:
+                initcmd = input("(InstallationENV) ")
+                if initcmd == 'exit':
+                    exit()
+                if initcmd == 'shell':
+                    break
+                if initcmd == 'mkbpfs':
+                    mkbpfs()
+                if initcmd == 'getfs':
+                    downfs('https://raw.githubusercontent.com/xingyujie/binpython-repository/main/officialbpfsbase.bpfs')
+                if initcmd == 'getfsurl':
+                    fsurl = input("Please enter a download link (like: http://url.com/bpfs/bpfsbase.bpfs)")
+                    downfs(fsurl)
+                if initcmd == 'getfsfile':
+                    filepath = input("Please enter a (*.bpfs) file path: ")
+                    getfsfile(filepath)
+    try:
         global cmd_username
-        defaultprofile = open("binpython_files/userdata/defaultloginuser", "r")
+        defaultprofile = open(runpath + "/binpython_files/userdata/defaultloginuser", "r")
         cmd_username = defaultprofile.read()
-        os.chdir(f"binpython_files/userdata/home/{cmd_username}")
+        os.chdir(runpath + f"/binpython_files/userdata/home/{cmd_username}")
     except:
         cmd_username = 'user'
         print('Unable to switch to BINPython userprofile: Default user not found. To use a temporary directory user, use "adduser" and "setdefaultuser <username>" to create a user and set default user')
@@ -367,7 +485,7 @@ def binpython_cmd():
         pass
     class cmdshell(cmd.Cmd):
         intro = 'Welcome to BINPython Shell. Type help or ? to list commands and help.\n'
-        prompt = cmd_username + '@' + cmd_hostname + ':# '
+        prompt = cmd_username + '@' + cmd_hostname + ':~# '
         file = None
         try:
             os.makedirs(runpath + f"/binpython_files/cmd/")
@@ -518,6 +636,29 @@ def binpython_cmd():
                 f = open("install_error.log", "a")
                 f.write('Unzip package Error: ' + time.strftime('%m-%d-%Y %H:%M:%S',time.localtime(time.time())) + ' ' + str(error) + '\n')
             try:
+                f = open(runpath + f"/binpython_files/apps/{cmd_username}/{arg}/package.json")
+                pkginfo = json.loads(f.read())
+                print(f"""
+Package information:
+Name: {pkginfo['name']}
+Version: {pkginfo['version']}
+Summary: {pkginfo['summary']}
+Homepage: {pkginfo['homepage']}
+Author: {pkginfo['author']}  
+Email: {pkginfo['email']}     
+License: {pkginfo['license']}     
+                """)
+                f.close()
+                yn = input("Do you want to continue?(y/n): ")
+                if yn == 'y':
+                    pass
+                else:
+                    sys.exit(0)
+            except(Exception, BaseException) as error:
+                print('[W] Warning: Could not find package configuration information file, please see the log "install_warning.log" for details')
+                f = open("install_warning.log", "a")
+                f.write('Run package information Warning: ' + time.strftime('%m-%d-%Y %H:%M:%S',time.localtime(time.time())) + ' ' + str(error) + '\n')
+            try:
                 print("[*] configure package")
                 f = open(runpath + f"/binpython_files/apps/{cmd_username}/{arg}/config.py")
                 exec(f.read())
@@ -538,6 +679,7 @@ def binpython_cmd():
             if arg == '':
                 print("Please use install <package file name> missing options <package file name>")
                 exit()
+            nobpkgarg = arg.replace('.bpkg', '')
             try:
                 os.makedirs(runpath + f"/binpython_files/apps/{cmd_username}")
             except:
@@ -548,14 +690,36 @@ def binpython_cmd():
                 pass
             try:
                 print("[*] Unzip the package")
-                unzip(arg, runpath + f"/binpython_files/apps/{cmd_username}/{arg}")
+                unzip(arg, runpath + f"/binpython_files/apps/{cmd_username}/{nobpkgarg}")
             except(Exception, BaseException) as error:
                 print('Unzip the package failed, please see the log "install_error.log" for details')
                 f = open("install_error.log", "a")
                 f.write('Unzip package Error: ' + time.strftime('%m-%d-%Y %H:%M:%S',time.localtime(time.time())) + ' ' + str(error) + '\n')
             try:
+                f = open(runpath + f"/binpython_files/apps/{cmd_username}/{nobpkgarg}/package.json")
+                pkginfo = json.loads(f.read())
+                print(f"""
+Package information:
+Name: {pkginfo['name']}
+Version: {pkginfo['version']}
+Summary: {pkginfo['summary']}
+Homepage: {pkginfo['homepage']}
+Author: {pkginfo['author']}  
+Email: {pkginfo['email']}     
+License: {pkginfo['license']}     
+                """)
+                yn = input("Do you want to continue?(y/n): ")
+                if yn == 'y':
+                    pass
+                else:
+                    binpython_cmd()
+            except(Exception, BaseException) as error:
+                print('[W] Warning: Could not find package configuration information file, please see the log "install_warning.log" for details')
+                f = open("install_warning.log", "a")
+                f.write('Run package information Warning: ' + time.strftime('%m-%d-%Y %H:%M:%S',time.localtime(time.time())) + ' ' + str(error) + '\n')
+            try:
                 print("[*] configure package")
-                f = open(runpath + f"/binpython_files/apps/{cmd_username}/{arg}/config.py")
+                f = open(runpath + f"/binpython_files/apps/{cmd_username}/{nobpkgarg}/config.py")
                 exec(f.read())
             except(Exception, BaseException) as error:
                 print('[W]config file no configuration or configuration error, please see the log "install_warning.log" for details')
@@ -573,8 +737,7 @@ def binpython_cmd():
         def do_runapp(self, arg):
             'To run a BINPython bpkg program, first pass install <app name> or installfile <app package path> Usage: runapp <appname>. '
             try:
-                f = open(runpath + f"/binpython_files/apps/{cmd_username}/{arg}/main.py")
-                exec(f.read())
+                execpyfile(runpath + f"/binpython_files/apps/{cmd_username}/{arg}/main.py")
             except(Exception, BaseException) as error:
                 print('App not exits or failed, please see the log "binpython_pkg_error.log" for details')
                 f = open("binpython_pkg_error.log", "a")
@@ -598,7 +761,7 @@ def binpython_cmd():
         def do_editsource(self, arg):
             'To change the software source, usage: editsouce <souceurl>. Please pay attention to the software source specification, otherwise you will get an error. <souceurl> like this: http://xxx.com/'
             f = open(runpath + f"/binpython_files/apps/source.config", "w")
-            f.write(arg)
+            f.write('http://' + arg + '/')
         def do_tempuser(self, arg):
             'Create a temporary user, logging out will destroy the user space'
             print("You are trying to create a temporary user, this user space is only used for demonstration, testing and learning. When this user is logged out, all user data will also be deleted")
@@ -642,8 +805,9 @@ def binpython_cmd():
                 print('Can not initcmd, please see the log "binpython_cmd_error.log" for details')
                 f = open("binpython_cmd_error.log", "a")
                 f.write('Init CMD Error: ' + time.strftime('%m-%d-%Y %H:%M:%S',time.localtime(time.time())) + ' ' + str(error) + '\n')
-
-
+        def do_mkbpfs(self, arg):
+            'Make BINPython File System'
+            mkbpfs()
     if __name__ == '__main__':
         cmdshell().cmdloop()
 #cmd end
@@ -687,6 +851,9 @@ except getopt.GetoptError as err:
     sys.exit()
 #get every option and run
 for opt_name,opt_value in opts:
+    def execpyfile(filename):
+        f = open(filename)
+        exec(f.read())
     if opt_name in ('-h','--help'):
 #-h show full help function
         outputfullhelp()
@@ -1085,6 +1252,4 @@ try:
     startupcode = open(filename.read(),encoding = "utf-8")
     exec(startupcode.read())
 except:
-    pass
-#go shell
-binpython_shell()
+    binpython_shell()

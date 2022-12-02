@@ -3,11 +3,13 @@
 
 block_cipher = None
 from pywebio.utils import pyinstaller_datas
-
+strpywebiodatas = str(pyinstaller_datas())
+newpywebiodatas = strpywebiodatas.replace('[', '').replace(']', '').replace('"', '')
+binpythondatas = [newpywebiodatas, ('C:\\Users\\xingyujie\\Documents\\GitHub\\binpython\\webui.py', '.')].replace('"', '')
 a = Analysis(['binpython.py'],
              pathex=[],
              binaries=[],
-             datas=pyinstaller_datas(),
+             datas=binpythondatas,
              hiddenimports=[],
              hookspath=[],
              hooksconfig={},
