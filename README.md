@@ -14,7 +14,7 @@
 ![author](https://img.shields.io/badge/Author-xingyujie-orange)
 ### Discord: https://discord.gg/dz9HwwdSXh
 ### Telegram: @binpython
-### Twitter: xyj_offical
+### Twitter: @EdwardHsing_xyj
 ## NEW!!! BINPython documentation：http://docs.binpython.org
 [Documentation](http://docs.binpython.org#/)
 
