@@ -4,14 +4,14 @@
 ####################################
 #build configure
 
-ver = "0.44"
+ver = "0.45"
 
 libs_warning = "1"
 #1 is ture 0 is false.
 #Changing the value to 0 will close the prompt that the library does not exist
 
 
-releases_ver = "offical"
+releases_ver = "official"
 importlibs = "os"
 cloudrunver = "1.04"
 cmdver = "0.08"
@@ -92,12 +92,17 @@ try:
     import wget
     import shutil
     import json
+    import sqlite3
+    import openai
 #fix for exit()
     from sys import exit
 #import for http_server
     import http.server
     import socketserver
-    import flask
+    from flask import Flask, render_template, request, redirect, url_for
+    from flask_login import LoginManager, current_user, login_required, UserMixin, login_user, logout_user
+    from werkzeug.security import generate_password_hash, check_password_hash
+    from werkzeug.utils import secure_filename
 #except ImportError:
 except(Exception, BaseException) as error:
     print("Unable to use any library, the program does not work properly, please rebuild")
@@ -417,7 +422,7 @@ def downfs(bpfsurl):
         pass
         print("[*] Download File System BPFS(BINPython File System)")
         wget.download(bpfsurl, runpath + "/binpython_files")
-        unzip(runpath + "/binpython_files/officialbpfs.bpfs", runpath + "/binpython_files")
+        unzip(runpath + "/binpython_files/officialbpfsbase.bpfs", runpath + "/binpython_files")
         print("\n")
         print("[*] Done!")
         binpython_cmd()
@@ -428,18 +433,8 @@ def binpython_cmd():
         os.chdir(runpath + f"/binpython_files/userdata/")
         os.chdir(runpath + f"/binpython_files/cmd")
     except:
-        whichmethod = input("""
-Welcome to BINPython CMD! Choose a method to install BINPython CMD:
-1. WEB graphical interactive installation (recommended)
-2. Interactive text interface (also for non-graphical devices)
-Please enter a number (1/2): 
-""")
-        if whichmethod == '1':
-            getwebui = open(get_resource_path('webui.py'))
-            webui = getwebui.read()
-            exec(webui)
-        if whichmethod == '2':
             print('''
+    Welcome to BINPython CMD!
     The file system cannot be found or there is an incomplete file system.
     type "getfs" to download a file system;
     type "getfsurl" to download a filesystem via a custom url;
@@ -459,6 +454,8 @@ Please enter a number (1/2):
                     mkbpfs()
                 if initcmd == 'getfs':
                     downfs('https://raw.githubusercontent.com/xingyujie/binpython-repository/main/officialbpfsbase.bpfs')
+                    print("Finish! please restart BINPython")
+                    sys.exit()
                 if initcmd == 'getfsurl':
                     fsurl = input("Please enter a download link (like: http://url.com/bpfs/bpfsbase.bpfs)")
                     downfs(fsurl)
