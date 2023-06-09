@@ -5,3 +5,4 @@ tornado
 xlrd
 wget
 requests
+Nuitka==1.6.1
