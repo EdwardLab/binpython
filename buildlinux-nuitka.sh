@@ -2,4 +2,4 @@
 
 
 nuitka3 --standalone --onefile --enable-plugin=tk-inter  \
- --follow-imports -include-package-data=pywebio binpython.py
+ --follow-imports --include-package-data=pywebio binpython.py
