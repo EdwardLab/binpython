@@ -118,7 +118,10 @@ try:
         import pygame.locals
         import pyglet
     null = importpygame
-    import pyautogui
+    try:
+        import pyautogui
+    except:
+        pass
 #warning for gui
 except ImportError:
     if libs_warning == "1":
