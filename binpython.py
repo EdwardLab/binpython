@@ -1,26 +1,22 @@
-#BINPython By:XINGYUJIE AGPL-V3.0 LICENSE Release
-#Please follow the LICENSE AGPL-V3
+#BINPython AGPL-V3.0 LICENSE Release
+#Under the AGPL-V3 license
 #full version
+
+
 ####################################
 #build configure
 
-ver = "0.45"
-
+ver = "0.46"
 libs_warning = "1"
 #1 is ture 0 is false.
 #Changing the value to 0 will close the prompt that the library does not exist
 
 
 releases_ver = "official"
-importlibs = "os"
+importlibs = "" # For custom imported libraries before building, use "," to separate them (must be installed in the native Python before building), or directly use import <library> to add to the list below, example: importlibs = "os,sys,wget,flask"
 cloudrunver = "1.04"
 cmdver = "0.08"
-#Imported library name, please use "importlibs="<library name>" instead of "import <library name>"
-#Please note: The "importlibs" function does not support loading functions (such as from xxxx import xxxx, if necessary, please write it in the following location. However, please note that this operation may have the risk of error reporting, please report issues or solve it yourself
-#xxxxxxxxxxxxxx
 
-#from xxxx import xxxx
-#xxxxxxxxxxxxxx
 ####################################
 
 #BINPython function and variable START
@@ -55,15 +51,17 @@ def binpythonallconf():
 if sys == "Windows":
     import ctypes
     ctypes.windll.kernel32.SetConsoleTitleW("BINPython " + ver)
-#binpython self import function
-def self_import(name):
-    __import__(name)
 try:
-    self_import(importlibs)
+    if importlibs != '':
+        import importlib
+        libraries = importlibs.split(",")
+        for lib in libraries:
+            importlib.import_module(lib)
 #get libswarning
-except ImportError:
+except ImportError as e:
     if libs_warning == "1":
         print("Warning: Custom import library %s does not exist, please check the source code library configuration and rebuild" % importlibs)
+        print("Error: " + str(e))
         print("")
 #run python files option(-f)
 def optreadfile():
@@ -71,7 +69,6 @@ def optreadfile():
     getfile = sys.argv[1]
     getfilecode = open(getfile,encoding = "utf-8")
     exec(getfilecode.read())
-    input("Run finished. Enter to Shell.")
     sys.exit(0)
 try:
 #base import
@@ -92,8 +89,10 @@ try:
     import wget
     import shutil
     import json
-    import sqlite3
-    import openai
+    import rich
+    from rich.console import *
+    from rich.markdown import *
+    from rich.syntax import *
 #fix for exit()
     from sys import exit
 #import for http_server
@@ -119,6 +118,7 @@ try:
         import pygame.locals
         import pyglet
     null = importpygame
+    import pyautogui
 #warning for gui
 except ImportError:
     if libs_warning == "1":
@@ -139,6 +139,15 @@ try:
     import rlcompleter
     import array
     import xlrd
+    import email.mime.message
+    import email.mime.application
+    import email.mime.audio
+    import email.mime.base
+    import email.mime.image
+    import email.mime.multipart
+    import email.mime.text
+    import email.mime.nonmultipart
+    import sqlite3
 except ImportError:
     if libs_warning == "1":
         print("Warning: Some libraries for functions, data types, etc. for BINPython do not exist, such as rlcomplter and array.  Because they weren't built when they were built.  If you need to fix this warning, please complete the support libraries imported in the source code when building (use pip or build it yourself), if your system does not support these libraries, you can remove or change this prompt in the source code and rebuild")
@@ -154,8 +163,8 @@ except ImportError:
 
 #main BINPython
 def binpython_welcome_text():
-    print("BINPython " + ver + "-" + releases_ver + " (Python Version:" + platform.python_version() + ") By: Edward Hsing(Xing Yu Jie) https://github.com/xingyujie/binpython[Running on " + platform.platform() + " " + platform.version() + "]")
-    print('Type "about", "help", "copyright", "credits" or "license" for more information. Type "binpython_cmd" to enter BINPython CMD')
+    print("BINPython " + ver + "-" + releases_ver + " Python " + platform.python_version() + " [Running on " + platform.platform() + " " + platform.version() + "]")
+    print('Type "about", "help", "copyright", "credits" or "license" for more information. Type "binpython_cmd()" to enter BINPython CMD')
 def binpython_shell():
     while True:
         try:
@@ -164,7 +173,7 @@ def binpython_shell():
                 print(globals()[pycmd])
                 continue
             elif pycmd == 'about':
-                print("BINPython By: Edward Hsing(Xing Yu Jie)[https://github.com/xingyujie] AGPL-3.0 LICENSE Release")
+                print("BINPython By: Edward Hsing[https://github.com/xingyujie] AGPL-3.0 LICENSE Release")
             elif pycmd == 'help':
                 print("Type help() for interactive help, or help(object) for help about object.")
             elif pycmd == 'copyright':
@@ -201,6 +210,8 @@ try:
     optreadfile()
 except:
     pass
+
+
 def cloudruncli():
            
         print("Welcome to CloudRun CLI. Let your script run in the cloud with BINPython")
@@ -250,10 +261,6 @@ exit -- quit cloudrun
                 pass
             else:
                 pass
-            
-#cloudrun functions start
-from pywebio.output import *
-import pywebio.input
 class cloudrun:
     def get(pkgname):
         try:
@@ -426,23 +433,32 @@ def downfs(bpfsurl):
         print("\n")
         print("[*] Done!")
         binpython_cmd()
+def pkg_inst_ask():
+    try:
+        input("Enter to continue")
+    except:
+        sys.exit()
+
+    
 def binpython_cmd():
     global runpath
+    os.system('cls' if os.name == 'nt' else 'clear')
     runpath = os.path.dirname(os.path.realpath(sys.argv[0]))
+    time.sleep(3)
     try:
         os.chdir(runpath + f"/binpython_files/userdata/")
         os.chdir(runpath + f"/binpython_files/cmd")
     except:
             print('''
-    Welcome to BINPython CMD!
-    The file system cannot be found or there is an incomplete file system.
-    type "getfs" to download a file system;
-    type "getfsurl" to download a filesystem via a custom url;
-    Type "getfsfile" to unzip the filesystem via file;
-    type "mkbpfs" to make a new file system;
-    type "exit" to exit;
-    type "shell" to force entry into the shell.
-    * After forcing into the shell, you can create bpfs via "mkbpfs" command or use "adduser", "setdefaultuser" and other commands to build the filesystem step by step. But we don't recommend it, it may be more problematic and more complex
+Welcome to BINPython CMD!
+The file system cannot be found or there is an incomplete file system.
+type "getfs" to download a file system;
+type "getfsurl" to download a filesystem via a custom url;
+Type "getfsfile" to unzip the filesystem via file;
+type "mkbpfs" to make a new file system;
+type "exit" to exit;
+type "shell" to force entry into the shell.
+* After forcing into the shell, you can create bpfs via "mkbpfs" command or use "adduser", "setdefaultuser" and other commands to build the filesystem step by step. But we don't recommend it, it may be more problematic and more complex
     ''')
             while True:
                 initcmd = input("(InstallationENV) ")
@@ -470,6 +486,7 @@ def binpython_cmd():
     except:
         cmd_username = 'user'
         print('Unable to switch to BINPython userprofile: Default user not found. To use a temporary directory user, use "adduser" and "setdefaultuser <username>" to create a user and set default user')
+        print()
     try:
         gethostname = open(runpath + "/binpython_files/hostname/hostname", "r")
         cmd_hostname = gethostname.read()
@@ -525,7 +542,7 @@ def binpython_cmd():
                 print(error)
             print("Done")
         def do_setdefaultuser(self, arg):
-            'Set a default user'
+            'Set a default user. Usage: setdefaultuser <username>'
             defaultprofile = open(runpath + "/binpython_files/userdata/defaultloginuser", "w")
             defaultprofile.write(arg)
             print("Done")
@@ -544,8 +561,8 @@ def binpython_cmd():
             defaulteditor.write(arg)
         def do_edit(self, arg):
             'Before using this command, you must use "seteditor <editorname>" to set the editor (see the usage of this parameter for details), otherwise it cannot be called up. edit usage: edit <filename>'
-            defaulteditor = open(runpath + f"/binpython_files/userdata/home/{cmd_username}/defaulteditor.config", "r")
             try:
+                defaulteditor = open(runpath + f"/binpython_files/userdata/home/{cmd_username}/defaulteditor.config", "r")
                 os.system(defaulteditor.read() + ' ' + arg)
             except KeyboardInterrupt:
                 pass
@@ -578,10 +595,6 @@ def binpython_cmd():
             writetext = open(arg, "w")
             arg1 = input(f"What you want to write to the target file {arg}: ")
             writetext.write(arg1)
-        def do_ukraine(self, arg):
-            'stand with ukraine'
-            print("We stand with Ukraine")
-            webbrowser.open("https://war.ukraine.ua/")
         def do_uname(self, arg):
             'version of CMD'
             print(f"BINPython CMD By: Edward Hsing VER:{cmdver} ")
@@ -646,11 +659,7 @@ Email: {pkginfo['email']}
 License: {pkginfo['license']}     
                 """)
                 f.close()
-                yn = input("Do you want to continue?(y/n): ")
-                if yn == 'y':
-                    pass
-                else:
-                    sys.exit(0)
+                pkg_inst_ask()
             except(Exception, BaseException) as error:
                 print('[W] Warning: Could not find package configuration information file, please see the log "install_warning.log" for details')
                 f = open("install_warning.log", "a")
@@ -670,6 +679,10 @@ License: {pkginfo['license']}
                 print('Failed to clean up temporary files, please see the log "install_error.log" for details')
                 f = open("install_error.log", "a")
                 f.write('clean up temporary files Error: ' + time.strftime('%m-%d-%Y %H:%M:%S',time.localtime(time.time())) + ' ' + str(error) + '\n')
+            try:
+                os.removedirs(runpath + f"/binpython_files/apps/{cmd_username}/installtemp")
+            except:
+                pass
             print("[OK]Finished!")
         def do_installfile(self, arg):
             'Install package from local bpkg file'
@@ -705,11 +718,7 @@ Author: {pkginfo['author']}
 Email: {pkginfo['email']}     
 License: {pkginfo['license']}     
                 """)
-                yn = input("Do you want to continue?(y/n): ")
-                if yn == 'y':
-                    pass
-                else:
-                    binpython_cmd()
+                pkg_inst_ask()
             except(Exception, BaseException) as error:
                 print('[W] Warning: Could not find package configuration information file, please see the log "install_warning.log" for details')
                 f = open("install_warning.log", "a")
@@ -722,6 +731,10 @@ License: {pkginfo['license']}
                 print('[W]config file no configuration or configuration error, please see the log "install_warning.log" for details')
                 f = open("install_warning.log", "a")
                 f.write('Run package configuration file Error: ' + time.strftime('%m-%d-%Y %H:%M:%S',time.localtime(time.time())) + ' ' + str(error) + '\n')
+            try:
+                os.removedirs(runpath + f"/binpython_files/apps/{cmd_username}/installtemp")
+            except:
+                pass
             print("[OK]Finished!")
         def do_switchappdir(self, arg):
             'Switch to App directory. Usage: switchappdir <appname>'
@@ -815,45 +828,42 @@ helpinfo = """
 Usage: binpython [OPTIONS]
 
 Options:
-<filename>                         Enter Python Filename and run (*.py)
--f            --file               Enter Python Filename and run (*.py), But this options is no Run finished prompt
--h            --help               View this help
--s <port>     --server=<port>      Start a simple web server that supports html and file transfer (http.server)
--g            --gui                View GUI About and build info
--i            --idle               Open BINPython IDLE Code Editor
--p <port>     --plus=<port>        Open BINPython IDE Plus Code Editor(beta) with http web server
--e            --example            Run various code examples through BINPython
--c            --cmd                Operations on BINPython (including Package Manager, CloudRun, etc.)
--v            --version            View BINPython Version
+<filename>                         Enter a Python filepath and run the script (*.py) [or -f <filename>]
+-h            --help               View this help documentation
+-s <port>     --server=<port>      Start a simple web server that supports HTML and file transfer (using http.server)
+-i            --idle               Launch the BINPython IDLE
+-e            --example            Run library and code examples
+-c            --cmd                BINPython CMD (Use the "help" command to view cmd help)
+-v            --version            Print BINPython Version
 """
-#base + plus, print full help
-def outputfullhelp():
+
+def custhelp():
     try:
         f = open("binpython_config/help.txt",encoding = "utf-8")
         print(f.read())
     except:
         print(helpinfo)
 #set about info
-about = "BINPython " + ver + "-" + releases_ver + " By: Edward Hsing(Xing Yu Jie)[https://github.com/xingyujie/binpython] AGPL-3.0 LICENSE Release"
+about = "BINPython " + ver + "-" + releases_ver + " By: DigitalPlat Edward Hsing [https://github.com/xingyujie/binpython, http://digitalplat.org, http://binpython.org] AGPL-3.0 LICENSE Release"
 #getopt
 try:
 #set options
-    opts,args = getopt.getopt(sys.argv[1:],'-h-f:-s:-g-i-p:-e-c-v',['help','file=','server=','gui','idle','plus','example','cmd','version'])
+    opts,args = getopt.getopt(sys.argv[1:],'-h-f:-s:-i-e-c-v',['help','file=','server=','idle','example','cmd','version'])
 #set getopt error prompt
 except getopt.GetoptError as err:
     print("Please check help:")
-    print("The parameters you use do not exist or are not entered completely, please check help!!!!")
-#then show full help(outputfullhelp())
-    outputfullhelp()
+    print("Invalid gargument. Please check help.")
+#show full help(custhelp())
+    custhelp()
     sys.exit()
-#get every option and run
+#get every argv
 for opt_name,opt_value in opts:
     def execpyfile(filename):
         f = open(filename)
         exec(f.read())
     if opt_name in ('-h','--help'):
 #-h show full help function
-        outputfullhelp()
+        custhelp()
         sys.exit()
     if opt_name in ('-v','--version'):
 #-v show version(read custom config)
@@ -862,7 +872,7 @@ for opt_name,opt_value in opts:
             exec(f.read())
             print("Powered by: BINPython[https://github.com/xingyujie/binpython] AGPL 3.0")
         except:
-            print("BINPython " + ver + "-" + releases_ver + " By: Edward Hsing(Xing Yu Jie)[https://github.com/xingyujie/binpython] AGPL-3.0 LICENSE Release")
+            print("BINPython " + ver + "-" + releases_ver + " By: DigitalPlat Edward Hsing [https://github.com/xingyujie/binpython, http://digitalplat.org, http://binpython.org] AGPL-3.0 LICENSE Release")
             print("Python " + platform.python_version())
         sys.exit()
     if opt_name in ('-f','--file'):
@@ -884,189 +894,102 @@ with socketserver.TCPServer(("", PORT), Handler) as httpd:
     print("serving at port", PORT)
     httpd.serve_forever()
 """)
-    if opt_name in ('-g','--gui'):
-#-g gui show gui about info(based on tkinter)
-        from tkinter import *
-        root = Tk()
-        root.title("Welcome to BINPython")
-        root.geometry('600x300')
-        text =Text(root, width=35, heigh=15)
-        text.pack()
-        text.insert("insert", "BINPython" + about)
-        print(text.get("1.3", "1.end"))
-        ####
-        text=Label(root,text="Welcome to BINPython" + ver,bg="yellow",fg="red",font=('Times', 20, 'bold italic'))
-        text.pack()
-        button=Button(root,text="EXIT",command=root.quit)
-        button.pack(side="bottom")
-        root.mainloop()
-        sys.exit()
-    def show():
-        os.system('cls' if os.name == 'nt' else 'clear')
-        print("<<<<<<<<<<START>>>>>>>>>>")
-        exec(e1.get(1.0, END))
 #tkinter ide Simulation environment
     if opt_name in ('-i','--idle'):
         import tkinter as tk
         from tkinter import *
+        import os
+        from tkinter import Menu
+        from tkinter import messagebox
+
+        def show():
+            binpythonwin.setwindowtitle("BINPython IDLE Mode")
+            code = e1.get(1.0, END)
+            print("================= BINPython Restart =================")
+            exec(code)
+
+        def about():
+            messagebox.showinfo("About BINPython IDLE", "Welcome to BINPython " + str(ver) + " Python Version: " + platform.python_version())
+
+        def copy_text():
+            selected_text = e1.get(SEL_FIRST, SEL_LAST)
+            if selected_text:
+                e1.clipboard_clear()
+                e1.clipboard_append(selected_text)
+
+        def cut_text():
+            selected_text = e1.get(SEL_FIRST, SEL_LAST)
+            if selected_text:
+                e1.delete(SEL_FIRST, SEL_LAST)
+                e1.clipboard_clear()
+                e1.clipboard_append(selected_text)
+
+        def paste_text():
+            clipboard_text = e1.clipboard_get()
+            if clipboard_text:
+                e1.insert(INSERT, clipboard_text)
+
+        def select_all():
+            e1.tag_add("sel", "1.0", "end")
+
+        def show_popup_menu(event):
+            menu = tk.Menu(master, tearoff=0)
+            menu.add_command(label="Copy", command=copy_text)
+            menu.add_command(label="Cut", command=cut_text)
+            menu.add_command(label="Paste", command=paste_text)
+            menu.add_command(label="Select All", command=select_all)
+            menu.post(event.x_root, event.y_root)
+
         master = tk.Tk()
         master.title("BINPython IDLE")
-        
- 
-        tk.Label(master, text="Type Code", height=5).grid(row=0)
- 
-        e1 = Text(master,
-            width=150,
-            height=40,)
-        
-        e1.grid(row=0, column=1, padx=10, pady=5)
-        tk.Button(master, text="Run", width=10, command=show).grid(row=3, column=0, sticky="w", padx=10, pady=5)
-        tk.Button(master, text="EXIT", width=10, command=master.quit).grid(row=3, column=1, sticky="e", padx=10, pady=5)
+
+        # Set theme colors
+        master.configure(bg="#1F1F1F")
+        master.option_add('*TButton*highlightBackground', "#1F1F1F")
+        master.option_add('*TButton*highlightColor', "#1F1F1F")
+
+        # Create a menu bar
+        menu = Menu(master)
+        master.config(menu=menu)
+
+        # Create a File menu
+        file_menu = Menu(menu)
+        menu.add_cascade(label="File", menu=file_menu)
+        file_menu.add_command(label="Run", command=show)
+        file_menu.add_separator()
+        file_menu.add_command(label="Exit", command=master.quit)
+
+        # Create an Edit menu
+        edit_menu = Menu(menu)
+        menu.add_cascade(label="Edit", menu=edit_menu)
+        edit_menu.add_command(label="Copy", command=copy_text)
+        edit_menu.add_command(label="Cut", command=cut_text)
+        edit_menu.add_command(label="Paste", command=paste_text)
+        edit_menu.add_command(label="Select All", command=select_all)
+
+        # Create a Help menu
+        help_menu = Menu(menu)
+        menu.add_cascade(label="Help", menu=help_menu)
+        help_menu.add_command(label="About", command=about)
+
+        # Add a code input field
+        e1 = Text(master, bg="#1F1F1F", fg="white")
+        e1.grid(row=0, column=0, padx=10, pady=5, columnspan=2, sticky="nsew")
+
+        # Bind right-click menu
+        e1.bind("<Button-3>", show_popup_menu)
+
+        # Add Run and Exit buttons
+        run_button = tk.Button(master, text="Run", width=10, command=show, bg="#0078D4", fg="white")
+        exit_button = tk.Button(master, text="EXIT", width=10, command=master.quit, bg="#0078D4", fg="white")
+        run_button.grid(row=1, column=0, padx=10, pady=5, sticky="w")
+        exit_button.grid(row=1, column=1, padx=10, pady=5, sticky="e")
+
+        master.columnconfigure(0, weight=1)
+        master.rowconfigure(0, weight=1)
+
         master.mainloop()
-        sys.exit()
-#-p binpython ideplus
-    if opt_name in ('-p','--plus'):
-        ideplusport = opt_value
-        import pywebio.input
-        from pywebio.input import *
-        from pywebio.output import *
-        from pywebio import *
-        from pywebio.session import *
-        import sys
-        import subprocess
-        import os
-        import webbrowser
-        print("______________________________________")
-        print("BINPython WEB IDE STARTED")
-        print(f"""
-Welcome to BINPython IDEPlus!
-HTTP Port: {ideplusport}
-""")
-#open browser
-        webbrowser.open(f"http://127.0.0.1:{ideplusport}")
-        #IDE Plus main
-        def line():
-            put_text('_______________________',
-                sep=' '
-            )
-#set bootstrap ui(bar)
-        def head():
-            set_env(title="BINPython IDE Plus", auto_scroll_bottom=True)
-            put_html(f"""
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-  <a class="navbar-brand" href="http://localhost:{ideplusport}"></a>
-    <img src="https://github.com/xingyujie/binpython/blob/main/py.ico?raw=true" width="30" height="30" class="d-inline-block align-top" alt="">
-    BINPython IDEPlus
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-  <div class="collapse navbar-collapse" id="navbarSupportedContent">
-    <ul class="navbar-nav mr-auto">
-      <li class="nav-item">
-        <a class="nav-link active" aria-current="page" href="http://localhost:{ideplusport}/">Home</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="http://localhost:{ideplusport}/?app=ideplus">IDEPlus</a>
-      </li>
-        </a>
-    </ul>
-  </div>
-</nav>
 
-""")
-        def plushead():
-            set_env(title="BINPython IDE Plus", auto_scroll_bottom=True)
-            put_html(f"""
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-  <a class="navbar-brand" href="http://localhost:{ideplusport}"></a>
-    <img src="https://github.com/xingyujie/binpython/blob/main/py.ico?raw=true" width="30" height="30" class="d-inline-block align-top" alt="">
-    BINPython IDEPlus
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-  <div class="collapse navbar-collapse" id="navbarSupportedContent">
-    <ul class="navbar-nav mr-auto">
-      <li class="nav-item">
-        <a class="nav-link" href="http://localhost:{ideplusport}/">Home</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link active" aria-current="page" href="http://localhost:{ideplusport}/?app=ideplus">IDEPlus</a>
-      </li>
-        </a>
-    </ul>
-  </div>
-</nav>
-
-""")
-        def aboutideplus():
-            head()
-            put_markdown("## About BINPython IDEPlus")
-            put_markdown("""
-BINPython is made by:
-
-[xingyujie(Edward Hsing)](https://github.com/xingyujie)
-
-AGPL-V3.0 Release
-
-""")
-        def welcomecard():
-            put_html(f"""
-  <div class="jumbotron">
-  <h1 class="display-3">Welcome to BINPython!</h1>
-  <p class="lead">This is a portable IDE environment for BINPython</p>
-  <hr class="my-4">
-  <p>Fast and portable, runs via BINPython</p>
-  <p class="lead">
-    <a class="btn btn-primary btn-lg" href="http://localhost:{ideplusport}/?app=ideplus" role="button">Try IDE Plus!</a>
-  </p>
-</div>
-""")
-#index ui
-        def index():
-            head()
-            welcomecard()
-            put_markdown("## Features")
-            put_link("IDEPlus", url=f'http://localhost:{ideplusport}/?app=ideplus')
-            line()
-            put_link("About BINPython", url=f'http://localhost:{ideplusport}/?app=aboutideplus')
-            line()
-            put_link("View Code", url=f'http://localhost:{ideplusport}/?app=viewcode')
-        def idehead():
-            set_env(title="BINPython IDE Plus", auto_scroll_bottom=True)
-            put_html("<h1>BINPython IDE Plus</h1>")
-            put_text('Welcome to BINPython IDE Plus, Please type code',
-                    sep=' '
-                )
-            line()
-            toast("BINPython IDE Plus is a beta version. May be removed or changed in the future")
-#ideplus
-        def ideplus():
-            plushead()
-            idehead()
-            res = textarea('BINPython IDE Plus', rows=45, code={
-            'mode': "python",
-            'theme': 'darcula'
-            })
-            exec(res)
-            toast("Run finished!")
-            put_success("Finished, Please see BINPython Window or Terminal")
-            put_text("Here is the code you wrote")
-            put_code(res, language='python')
-            savecodefilename = pywebio.input.input('Do you want to save the code you wrote to a file? Enter a filename and save it')
-            f = open(savecodefilename, 'wb+')
-            f.write(res.encode("utf-8"))
-            toast("Successfully saved")
-            put_success("The save is successful, and the code is saved to binpython file path" + " \nThe file name is " + '"' + savecodefilename + '"')
-#view code
-        def viewcode():
-            plushead()
-            viewcode_code = pywebio.input.input("Please input file path:")
-            f = open(viewcode_code,encoding = "utf-8")
-            put_code(f.read(), language='python')
-        if __name__ == '__main__':
-            start_server([index, ideplus, aboutideplus, viewcode], debug=True, port=ideplusport)
-            pywebio.session.hold()
-            config(title="BINPython") #pywebio global title
 #binpython examples
     if opt_name in ('-e','--example'):
         print("Welcome to BINPython example")
@@ -1147,7 +1070,7 @@ List of examples:
                     pywebio.session.hold()
             examplepywebio()
             sys.exit()
-#helloworld
+#helloworld basic func
         if examplenum == "5":
             binpythonwin.setwindowtitle("Hi, Welcome to BINPython")
             name = input("hi...What's your name:")
@@ -1184,8 +1107,8 @@ try:
     exec(f.read())
     print("Powered by: BINPython[https://github.com/xingyujie/binpython] AGPL 3.0")
 except:
-    binpython_welcome_text()
-#debug mode show many info
+    pass
+#debug mode show info
 try:
     f = open("binpython_debug",encoding = "utf-8")
     print("Debug mode:on")
@@ -1208,45 +1131,6 @@ try:
     TestPlatform()
 except:
     pass
-#binpython custom function plugin 
-#plugin start
-class binpythonplugin:
-    plugin_name = ''
-    def name(key):
-        global plugin_name
-        plugin_name = key
-    #print(plugin_name)
-    plugin_anthor = ''
-    def anthor(key):
-        global plugin_anthor
-        plugin_anthor = key
-    #description
-    plugin_description = ''
-    def description(key):
-        global plugin_description
-        plugin_description = key
-    def showinfo():
-        print("BINPython Plugin Info:")
-        print("Plugin Name: " + plugin_name)
-        print("Plugin Anthor: " + plugin_anthor)
-        print("Plugin description: " + plugin_description)
-    plugin_loadmain = ''
-    def loadmain(key):
-        global plugin_loadmain
-        plugin_loadmain = key
-
-#binpython_plugin_loadmain("function.py")
-try:
-    f = open("binpython_plugin/pluginconfig.binpython",encoding = "utf-8")
-    exec(f.read())
-    f = open("binpython_plugin/" + plugin_loadmain,encoding = "utf-8")
-    exec(f.read())
-    binpython_shell()
-except:
-    pass
-try:
-    filename = open("startupfile.conf",encoding = "utf-8")
-    startupcode = open(filename.read(),encoding = "utf-8")
-    exec(startupcode.read())
-except:
+if len(sys.argv) == 1:
+    binpython_welcome_text()
     binpython_shell()

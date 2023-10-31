@@ -5,3 +5,8 @@ tornado
 xlrd
 wget
 requests
+flask
+flask_login
+pyautogui
+rich
+pyglet
