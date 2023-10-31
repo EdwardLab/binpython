@@ -10,3 +10,4 @@ flask_login
 pyautogui
 rich
 pyglet
+Nuitka==1.6.1
